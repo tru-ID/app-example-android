@@ -40,7 +40,7 @@ class LoginDataSource {
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val phoneCheckJsonAdapter:JsonAdapter<PhoneCheck> = moshi.adapter(PhoneCheck::class.java)
     private val phoneCheckResultJsonAdapter:JsonAdapter<PhoneCheckResult> = moshi.adapter(PhoneCheckResult::class.java)
-    private val LOCAL_ENDPOINT = "https://357835e890a9.ngrok.io"
+    private val LOCAL_ENDPOINT = "https://9bfff9107dd2.ngrok.io"
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun login(phoneNumber: String): Result<LoggedInUser> {

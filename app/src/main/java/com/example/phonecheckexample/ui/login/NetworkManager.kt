@@ -1,16 +1,18 @@
 package com.example.phonecheckexample.ui.login
 
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.content.Context.CONNECTIVITY_SERVICE
 import android.net.ConnectivityManager
+import android.net.ConnectivityManager.NetworkCallback
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
 import android.os.Handler
+import android.util.Log
 import androidx.annotation.RequiresApi
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import okio.IOException
 
 
@@ -21,11 +23,43 @@ class NetworkManager private constructor(context: Context) {
     private val client = OkHttpClient()
 
     init {
-        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        // Add any NetworkCapabilities.NET_CAPABILITY_...
+        val capabilities = intArrayOf(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+
+        // Add any NetworkCapabilities.TRANSPORT_...
+        val transportTypes = intArrayOf(NetworkCapabilities.TRANSPORT_CELLULAR)
+
+        alwaysPreferNetworksWith(capabilities, transportTypes)
+    }
+
+    private fun alwaysPreferNetworksWith(
+        capabilities: IntArray,
+        transportTypes: IntArray
+    ) {
+        val request = NetworkRequest.Builder()
+
+        // add capabilities
+        for (cap in capabilities) {
+            request.addCapability(cap)
+        }
+
+        // add transport types
+        for (trans in transportTypes) {
+            request.addTransportType(trans)
+        }
+        val connectivityManager =
+            context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerNetworkCallback(request.build(), object : NetworkCallback() {
             override fun onAvailable(network: Network) {
-                super.onAvailable(network)
-                //Use the network to do your thing
-                println("onAvailable: $network")
+                try {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                        ConnectivityManager.setProcessDefaultNetwork(network)
+                    } else {
+                        connectivityManager.bindProcessToNetwork(network)
+                    }
+                } catch (e: IllegalStateException) {
+                    Log.e(TAG, "ConnectivityManager.NetworkCallback.onAvailable: ", e)
+                }
             }
 
             override fun onLost(network: Network) {
@@ -36,16 +70,8 @@ class NetworkManager private constructor(context: Context) {
                 super.onUnavailable()
                 println("onUnavailable")
             }
-        }
 
-        var connectivityManager =
-            context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        val builder = NetworkRequest.Builder()
-        builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)//TRANSPORT_WIFI
-        val build = builder.build()
-        connectivityManager.requestNetwork(build, networkCallback)
+        })
     }
 
     fun requestAsync(url: String, method: String, body: RequestBody?=null, callback: Callback) {
@@ -95,7 +121,11 @@ class NetworkManager private constructor(context: Context) {
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-            return response.body!!.string()
+            val rawResponse = response.body!!.string()
+            println("Response to $url")
+            println(rawResponse)
+
+            return rawResponse
         }
     }
 
