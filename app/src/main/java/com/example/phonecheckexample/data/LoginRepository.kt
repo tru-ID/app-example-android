@@ -3,6 +3,8 @@ package com.example.phonecheckexample.data
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.phonecheckexample.data.model.LoggedInUser
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Class that requests authentication and user information from the remote data source and
@@ -30,20 +32,17 @@ class LoginRepository(val dataSource: LoginDataSource) {
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun login(phoneNumber: String, listener: LoginDataSource.LoginResultListener) {
-        // handle login
-        dataSource.login(phoneNumber, object : LoginDataSource.LoginResultListener {
-            override fun onLoginSuccess(result: Result.Success<LoggedInUser>) {
+    suspend fun login(phoneNumber: String): Result<LoggedInUser> {
+        return withContext(Dispatchers.IO) {
+
+            val result =  dataSource.login(phoneNumber)
+
+            if (result is Result.Success) {
                 setLoggedInUser(result.data)
-
-                listener.onLoginSuccess(result)
             }
 
-            override fun onLoginFailed(result: Result.Error) {
-                listener.onLoginFailed(result)
-            }
-
-        })
+            return@withContext result
+        }
     }
 
     private fun setLoggedInUser(loggedInUser: LoggedInUser) {

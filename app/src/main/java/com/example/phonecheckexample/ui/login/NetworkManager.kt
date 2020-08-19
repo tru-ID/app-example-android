@@ -6,18 +6,19 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.os.Handler
 import androidx.annotation.RequiresApi
-import com.android.volley.Request
-import com.android.volley.RequestQueue
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import okio.IOException
+
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class NetworkManager private constructor(context: Context) {
 
-    //for Volley API
-    var queue: RequestQueue
+    private val context = context
+    private val client = OkHttpClient()
 
     init {
         val networkCallback = object : ConnectivityManager.NetworkCallback() {
@@ -37,8 +38,6 @@ class NetworkManager private constructor(context: Context) {
             }
         }
 
-        queue = Volley.newRequestQueue(context.applicationContext)
-
         var connectivityManager =
             context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -46,11 +45,58 @@ class NetworkManager private constructor(context: Context) {
         builder.addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
         builder.addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)//TRANSPORT_WIFI
         val build = builder.build()
-        connectivityManager!!.requestNetwork(build, networkCallback)
+        connectivityManager.requestNetwork(build, networkCallback)
     }
 
-    fun <T> request(request: Request<T>?): Request<T?>? {
-        return queue.add(request)
+    fun requestAsync(url: String, method: String, body: RequestBody?=null, callback: Callback) {
+
+        val request = Request.Builder()
+            .method(method, body)
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+
+            var mainHandler: Handler = Handler(context.mainLooper)
+
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+
+                mainHandler.post(Runnable {
+                    callback.onFailure(call, e)
+                })
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+                    for ((name, value) in response.headers) {
+                        println("$name: $value")
+                    }
+
+                    println(response.body!!.string())
+
+                    mainHandler.post(Runnable {
+                        callback.onResponse(call, response)
+                    })
+                }
+            }
+        })
+
+    }
+
+    fun requestSync(url: String, method: String, body: RequestBody?=null): String {
+        val request = Request.Builder()
+            .method(method, body)
+            .url(url)
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+            return response.body!!.string()
+        }
     }
 
     companion object {

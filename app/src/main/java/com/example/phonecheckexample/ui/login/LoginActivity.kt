@@ -18,7 +18,6 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.android.volley.toolbox.Volley
 import com.example.phonecheckexample.R
 
 class LoginActivity : AppCompatActivity() {
@@ -98,6 +97,7 @@ class LoginActivity : AppCompatActivity() {
             }
 
             login.setOnClickListener {
+                println("clicked")
                 loading.visibility = View.VISIBLE
                 loadingView.visibility = View.VISIBLE
 //                login.visibility = View.VISIBLE
