@@ -1,10 +1,32 @@
 # 4Auth Phone Check for Android Example
 
-## Quick Notes
+An example of using 4Auth Phone Check replacing a username/password within a Login Activity.
 
-- Requires the 4Auth Node Server to be running
-- 4Auth Node Server needs to have a public URL. Use something like [Ngrok](https://ngrok.com/)
-- The URL to the [4Auth Node Server](https://gitlab.com/4auth/devx/4auth-node-server) will need to be updated within the code (should be moved to config). Search for `LOCAL_ENDPOINT`.
+## Before you being
+
+You will need:
+
+- Android capabile IDE e.g. [Android Studio](https://developer.android.com/studio)
+- A [4Auth Account](https://4auth.io/invite?invite_code=1752952342267259)
+- The [4Auth Node Server](https://gitlab.com/4auth/devx/4auth-node-server) & Node.JS installed
+    - Follow the instructions within the 4Auth Node Server README
+- An Android phone with a SIM card and mobile data connection
+
+## Getting Started
+
+- Clone or unzip the PhoneCheckExample into a directory.
+- Open the project with your Android Capabile IDE
+- Connect your phone to your computer so it's used for running the PhoneCheckExample application
+- Turn off WiFi on your mobile device
+- Run the application from your IDE
+- Enter the phone number for the mobile device in the UI
+- Press the done keyboard key or touch the "Sign in" button
+- You will see a toast notification indicating the result of the Phone Check
+- Get in touch: please email feedback@4auth.io with any questions
+
+## Notes
+
+- The URL to the [4Auth Node Server](https://gitlab.com/4auth/devx/4auth-node-server) is configured via a variable named `AUTH_ENDPOINT`. It defaults to `http://10.0.2.2:4040`.
 
 ## References
 
