@@ -97,10 +97,9 @@ class LoginActivity : AppCompatActivity() {
             }
 
             login.setOnClickListener {
-                println("clicked")
                 loading.visibility = View.VISIBLE
                 loadingView.visibility = View.VISIBLE
-//                login.visibility = View.VISIBLE
+                login.visibility = View.GONE
                 loginViewModel.login(phoneNumber.text.toString())
             }
         }
