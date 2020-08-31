@@ -4,11 +4,13 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.phonecheckexample.data.model.LoggedInUser
 import com.example.phonecheckexample.ui.login.NetworkManager
+import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import okhttp3.Response
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MediaType.Companion.toMediaType
 import java.io.IOException
 import java.lang.Exception
 import java.util.*
@@ -26,6 +28,11 @@ class LoginDataSource {
     }
 
     @JsonClass(generateAdapter = true)
+    class PhoneCheckPost(
+        var phone_number: String
+    )
+
+    @JsonClass(generateAdapter = true)
     class PhoneCheck(
         val check_url: String,
         val check_id: String
@@ -38,9 +45,10 @@ class LoginDataSource {
     )
 
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    private val phoneCheckPostJsonAdapter:JsonAdapter<PhoneCheckPost> = moshi.adapter(PhoneCheckPost::class.java)
     private val phoneCheckJsonAdapter:JsonAdapter<PhoneCheck> = moshi.adapter(PhoneCheck::class.java)
     private val phoneCheckResultJsonAdapter:JsonAdapter<PhoneCheckResult> = moshi.adapter(PhoneCheckResult::class.java)
-    private val LOCAL_ENDPOINT = "https://9bfff9107dd2.ngrok.io"
+    private val AUTH_ENDPOINT = "http://10.0.2.2:4040"
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun login(phoneNumber: String): Result<LoggedInUser> {
@@ -72,8 +80,11 @@ class LoginDataSource {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun getPhoneCheck(phoneNumber: String): PhoneCheck {
-        var localPhoneCheckCreateUrl = "$LOCAL_ENDPOINT/check?phone_number=$phoneNumber"
-        var response = NetworkManager.getInstance()?.requestSync(localPhoneCheckCreateUrl, method = "GET")
+        val localPhoneCheckCreateUrl = "$AUTH_ENDPOINT/check"
+        val mediaType = "application/json; charset=utf-8".toMediaType()
+        val phoneCheckPost = PhoneCheckPost(phone_number = phoneNumber)
+        val body = phoneCheckPostJsonAdapter.toJson(phoneCheckPost).toRequestBody(mediaType)
+        val response = NetworkManager.getInstance()?.requestSync(localPhoneCheckCreateUrl, method = "POST", body = body)
         try {
             val phoneCheck = phoneCheckJsonAdapter.fromJson(response)
             return phoneCheck!!
@@ -90,7 +101,7 @@ class LoginDataSource {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun getPhoneCheckResult(checkId: String): PhoneCheckResult {
-        var localPhoneCheckResultUrl = "$LOCAL_ENDPOINT/check_status?check_id=$checkId"
+        var localPhoneCheckResultUrl = "$AUTH_ENDPOINT/check_status?check_id=$checkId"
         var response = NetworkManager.getInstance()?.requestSync(localPhoneCheckResultUrl, method = "GET")
         return phoneCheckResultJsonAdapter.fromJson(response)!!
     }
