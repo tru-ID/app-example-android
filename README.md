@@ -7,7 +7,7 @@ An example of using 4Auth Phone Check replacing a username/password within a Log
 You will need:
 
 - Android capabile IDE e.g. [Android Studio](https://developer.android.com/studio)
-- A [4Auth Account](https://4auth.io/invite?invite_code=1752952342267259)
+- A [4Auth Account](https://4auth.io)
 - The [4Auth Node Server](https://gitlab.com/4auth/devx/4auth-node-server) & Node.JS installed
     - Follow the instructions within the 4Auth Node Server README
 - An Android phone with a SIM card and mobile data connection
