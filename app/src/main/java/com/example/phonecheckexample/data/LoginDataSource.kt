@@ -3,16 +3,14 @@ package com.example.phonecheckexample.data
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.phonecheckexample.data.model.LoggedInUser
-import com.example.phonecheckexample.ui.login.NetworkHelper
 import com.example.phonecheckexample.ui.login.NetworkManager
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.a4auth.sdk.SDK
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
 import java.io.IOException
 import java.lang.Exception
 import java.util.*
@@ -22,6 +20,8 @@ import java.util.*
  * Class that handles authentication w/ login credentials and retrieves user information.
  */
 class LoginDataSource {
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private val SDK4Auth = SDK()
 
     interface LoginResultListener {
         fun onLoginSuccess(result: Result.Success<LoggedInUser>)
@@ -99,11 +99,7 @@ class LoginDataSource {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun navigateToCheckUrl(checkUrl: String): String {
-        return NetworkManager.getInstance()?.requestSync(checkUrl, method = "GET")!!
-//
-//        val client = OkHttpClient()
-//        val networkHelper = NetworkHelper(client)
-//        return networkHelper.run(checkUrl)
+        return SDK4Auth.triggerCheck(checkUrl)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
