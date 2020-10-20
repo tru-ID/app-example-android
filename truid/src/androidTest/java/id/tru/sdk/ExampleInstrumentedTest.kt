@@ -1,4 +1,4 @@
-package com.a4auth.sdk
+package id.tru.sdk
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.a4auth.sdk.test", appContext.packageName)
+        assertEquals("id.tru.sdk.test", appContext.packageName)
     }
 }

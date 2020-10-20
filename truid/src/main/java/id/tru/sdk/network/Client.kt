@@ -1,4 +1,4 @@
-package com.a4auth.sdk.network
+package id.tru.sdk.network
 
 import android.content.ContentValues
 import android.content.Context
@@ -73,30 +73,7 @@ class Client(applicationContext: Context) {
             val rawResponse = response.body!!.string()
             println("Response to $url")
             println(rawResponse)
-
             return rawResponse
         }
-    }
-
-    companion object {
-        private var instance: Client? = null
-
-        @Synchronized
-        fun getInstance(context: Context): Client? {
-            if (null == instance) {
-                instance = Client(context)
-            }
-            return instance
-        }
-
-        @Synchronized
-        fun getInstance(): Client? {
-            checkNotNull(instance) {
-                Client::class.java.simpleName +
-                        " is not initialized, call getInstance(...) first"
-            }
-            return instance
-        }
-
     }
 }

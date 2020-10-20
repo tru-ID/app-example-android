@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.ui.login
+package com.example.phonecheckexample.services.network
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -9,7 +9,6 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
-import android.os.Handler
 import android.util.Log
 import androidx.annotation.RequiresApi
 import okhttp3.*
@@ -17,18 +16,14 @@ import okio.IOException
 
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-class NetworkManager private constructor(context: Context) {
+class Client private constructor(context: Context) {
 
     private val context = context
     private val client = OkHttpClient()
 
     init {
-        // Add any NetworkCapabilities.NET_CAPABILITY_...
         val capabilities = intArrayOf(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-
-        // Add any NetworkCapabilities.TRANSPORT_...
         val transportTypes = intArrayOf(NetworkCapabilities.TRANSPORT_CELLULAR)
-
         alwaysPreferNetworksWith(capabilities, transportTypes)
     }
 
@@ -38,12 +33,10 @@ class NetworkManager private constructor(context: Context) {
     ) {
         val request = NetworkRequest.Builder()
 
-        // add capabilities
         for (cap in capabilities) {
             request.addCapability(cap)
         }
 
-        // add transport types
         for (trans in transportTypes) {
             request.addTransportType(trans)
         }
@@ -74,44 +67,6 @@ class NetworkManager private constructor(context: Context) {
         })
     }
 
-    fun requestAsync(url: String, method: String, body: RequestBody?=null, callback: Callback) {
-
-        val request = Request.Builder()
-            .method(method, body)
-            .url(url)
-            .build()
-
-        client.newCall(request).enqueue(object : Callback {
-
-            var mainHandler: Handler = Handler(context.mainLooper)
-
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-
-                mainHandler.post(Runnable {
-                    callback.onFailure(call, e)
-                })
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
-
-                    for ((name, value) in response.headers) {
-                        println("$name: $value")
-                    }
-
-                    println(response.body!!.string())
-
-                    mainHandler.post(Runnable {
-                        callback.onResponse(call, response)
-                    })
-                }
-            }
-        })
-
-    }
-
     fun requestSync(url: String, method: String, body: RequestBody?=null): String {
         val request = Request.Builder()
             .method(method, body)
@@ -130,25 +85,26 @@ class NetworkManager private constructor(context: Context) {
     }
 
     companion object {
-
-        private var instance: NetworkManager? = null
+        private var instance: Client? = null
 
         @Synchronized
-        fun getInstance(context: Context): NetworkManager? {
-            if (null == instance) {
-                instance = NetworkManager(context)
+        fun setContext(context: Context): Client {
+            var currentInstance = instance
+            if (null == currentInstance) {
+                currentInstance = Client(context)
             }
-            return instance
+            instance = currentInstance
+            return currentInstance
         }
 
-        //this is so you don't need to pass context each time
         @Synchronized
-        fun getInstance(): NetworkManager? {
-            checkNotNull(instance) {
-                NetworkManager::class.java.simpleName +
+        fun getInstance(): Client {
+            var currentInstance = instance
+            checkNotNull(currentInstance) {
+                Client::class.java.simpleName +
                         " is not initialized, call getInstance(...) first"
             }
-            return instance
+            return currentInstance
         }
 
     }

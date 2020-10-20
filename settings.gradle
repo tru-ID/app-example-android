@@ -1,3 +1,3 @@
-include ':4auth'
+include ':truid'
 include ':app'
 rootProject.name = "PhoneCheckExample"

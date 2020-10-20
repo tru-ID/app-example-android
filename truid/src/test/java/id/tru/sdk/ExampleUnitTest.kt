@@ -1,4 +1,4 @@
-package com.a4auth.sdk
+package id.tru.sdk
 
 import org.junit.Test
 

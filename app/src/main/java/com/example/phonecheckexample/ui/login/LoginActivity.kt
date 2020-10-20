@@ -1,8 +1,6 @@
 package com.example.phonecheckexample.ui.login
 
 import android.app.Activity
-import android.content.Context
-import android.net.*
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -18,7 +16,9 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import id.tru.sdk.TruSDK
 import com.example.phonecheckexample.R
+import com.example.phonecheckexample.services.network.Client
 
 class LoginActivity : AppCompatActivity() {
 
@@ -28,8 +28,8 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ensure the NetworkManager is initialised
-        NetworkManager.getInstance(this)
+        Client.setContext(this.applicationContext)
+        TruSDK.initializeSdk(this.applicationContext)
 
         setContentView(R.layout.activity_login)
 
@@ -61,7 +61,7 @@ class LoginActivity : AppCompatActivity() {
 
             println("login result $loginResult")
 
-            if (loginResult.error != null) {447867526993
+            if (loginResult.error != null) {
                 showLoginFailed(loginResult.error)
             }
             if (loginResult.success != null) {
