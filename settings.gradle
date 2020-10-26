@@ -1,3 +1,3 @@
-include ':truid'
+include ':trusdk'
 include ':app'
 rootProject.name = "PhoneCheckExample"

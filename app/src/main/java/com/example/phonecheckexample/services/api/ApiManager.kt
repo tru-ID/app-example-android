@@ -23,7 +23,7 @@ class ApiManager {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun getPhoneCheck(phoneNumber: String): PhoneCheck {
         Log.println(Log.DEBUG, "ApiManager", "Triggering phone check request")
-        
+
         val localPhoneCheckCreateUrl = "$AUTH_ENDPOINT/check"
         val mediaType = "application/json; charset=utf-8".toMediaType()
         val phoneCheckPost = PhoneCheckPost(phone_number = phoneNumber)
