@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 .idea
+.vscode/
+.project
+.settings
+.classpath

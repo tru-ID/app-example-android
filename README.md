@@ -1,17 +1,18 @@
-# 4Auth Phone Check for Android Example
+# sample-app-android
 
-An example of using 4Auth Phone Check to replace a username/password within a Login Activity.
+[![License][license-image]][license-url]
+
 
 ## Before you being
 
 You will need:
 
 - Android capabile IDE e.g. [Android Studio](https://developer.android.com/studio)
-- A [4Auth Account](https://4auth.io)
-- The [4Auth Node Server](https://gitlab.com/4auth/devx/4auth-node-server) & Node.JS installed
+- A [tru.ID Account](https://tru.id)
+- The [Server Example](https://github.com/tru-ID/server-example-node) & Node.JS installed
     - Follow the instructions within the 4Auth Node Server README
     - A local tunnel solution such as [ngrok](https://ngrok.com/) when using a real mobile device
-    - The URL to the [4Auth Node Server](https://gitlab.com/4auth/devx/4auth-node-server) is configured via a variable named `AUTH_ENDPOINT`. It defaults to `http://10.0.2.2:4040`. Update to the ngrok URL.
+    - The URL to the [Server Example](https://github.com/tru-ID/server-example-node) is configured via a variable named `AUTH_ENDPOINT`. It defaults to `http://10.0.2.2:4040`. Update to the ngrok URL.
 - An Android phone with a SIM card and mobile data connection
 
 ## Getting Started
@@ -39,3 +40,12 @@ You will need:
 - [Moshi](https://github.com/square/moshi) for JSON serializing and deserializing
 - [okhttp](https://square.github.io/okhttp/) for HTTP requests
 - [Sending requests over Mobile data when WiFi is ON](https://stackoverflow.com/questions/25931334/send-request-over-mobile-data-when-wifi-is-on-android-l) 
+
+## Meta
+
+Distributed under the MIT license. See ``LICENSE`` for more information.
+
+[https://github.com/tru-ID](https://github.com/tru-ID)
+
+[license-image]: https://img.shields.io/badge/License-MIT-blue.svg
+[license-url]: LICENSE
