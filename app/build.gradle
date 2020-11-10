@@ -29,7 +29,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation 'id.tru.sdk:truid-sdk:0.0.2'
+    implementation 'id.tru.sdk:tru-sdk-android:0.0.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.1.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
