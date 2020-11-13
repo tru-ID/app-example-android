@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.ui.login
+package id.tru.android.login
 
 import android.os.Build
 import androidx.lifecycle.LiveData
@@ -7,11 +7,11 @@ import androidx.lifecycle.ViewModel
 import android.util.Patterns
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewModelScope
-import com.example.phonecheckexample.data.LoginRepository
-import com.example.phonecheckexample.data.Result
+import id.tru.android.data.LoginRepository
+import id.tru.android.data.Result
 
 import com.example.phonecheckexample.R
-import com.example.phonecheckexample.data.model.LoggedInUser
+import id.tru.android.data.model.LoggedInUser
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {

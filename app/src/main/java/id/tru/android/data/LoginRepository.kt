@@ -1,8 +1,8 @@
-package com.example.phonecheckexample.data
+package id.tru.android.data
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.example.phonecheckexample.data.model.LoggedInUser
+import id.tru.android.data.model.LoggedInUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

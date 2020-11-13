@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.data.model
+package id.tru.android.data.model
 
 import com.squareup.moshi.JsonClass
 

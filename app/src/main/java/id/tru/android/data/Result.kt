@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.data
+package id.tru.android.data
 
 /**
  * A generic class that holds a value with its loading status.

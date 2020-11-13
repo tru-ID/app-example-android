@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.services.api
+package id.tru.android.services.api
 
 import android.util.Log
 import id.tru.sdk.TruSDK

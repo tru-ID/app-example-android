@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.ui.login
+package id.tru.android.login
 
 /**
  * User details post authentication that is exposed to the UI

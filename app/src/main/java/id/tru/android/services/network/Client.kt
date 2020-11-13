@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.services.network
+package id.tru.android.services.network
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -69,7 +69,7 @@ class Client private constructor(context: Context) {
 
     fun requestSync(url: String, method: String, body: RequestBody?=null): String {
         val request = Request.Builder()
-            .method(method, body)
+            .method(method, body).addHeader("x-rta", "change_me")
             .url(url)
             .build()
 

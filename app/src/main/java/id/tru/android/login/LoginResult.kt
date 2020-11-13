@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.ui.login
+package id.tru.android.login
 
 /**
  * Authentication result : success (user details) or error message.

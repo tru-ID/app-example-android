@@ -4,18 +4,33 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('/Users/eric/keystore')
+            storePassword 'ericnad69'
+            keyAlias 'key0'
+            keyPassword 'ericnad69'
+        }
+        release {
+            keyAlias 'key0'
+            storeFile file('/Users/eric/keystore')
+            storePassword 'ericnad69'
+            keyPassword 'ericnad69'
+        }
+    }
     compileSdkVersion 30
     buildToolsVersion "30.0.2"
 
 
     defaultConfig {
-        applicationId "com.example.phonecheckexample"
+        applicationId "id.tru.android"
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
 
     buildTypes {

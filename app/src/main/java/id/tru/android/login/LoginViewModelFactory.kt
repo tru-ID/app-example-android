@@ -1,9 +1,9 @@
-package com.example.phonecheckexample.ui.login
+package id.tru.android.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.phonecheckexample.data.LoginDataSource
-import com.example.phonecheckexample.data.LoginRepository
+import id.tru.android.data.LoginDataSource
+import id.tru.android.data.LoginRepository
 
 /**
  * ViewModel provider factory to instantiate LoginViewModel.

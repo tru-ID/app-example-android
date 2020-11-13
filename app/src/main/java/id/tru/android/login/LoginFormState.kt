@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.ui.login
+package id.tru.android.login
 
 /**
  * Data validation state of the login form.

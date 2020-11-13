@@ -1,4 +1,4 @@
-package com.example.phonecheckexample.ui.login
+package id.tru.android.login
 
 import android.app.Activity
 import android.os.Build
@@ -18,7 +18,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import id.tru.sdk.TruSDK
 import com.example.phonecheckexample.R
-import com.example.phonecheckexample.services.network.Client
+import id.tru.android.services.network.Client
 
 class LoginActivity : AppCompatActivity() {
 
