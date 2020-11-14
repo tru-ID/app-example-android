@@ -23,7 +23,6 @@ class LoginActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        println("onCreate ")
 
         Client.setContext(this.applicationContext)
         TruSDK.initializeSdk(this.applicationContext)
@@ -48,49 +47,57 @@ class LoginActivity : AppCompatActivity() {
     private fun doCheck(phone: String, view: TextView, load: ProgressBar) {
         val apiManager = ApiManager()
         val redirectManager = RedirectManager()
+        val startTime = System.currentTimeMillis()
+
+        // Step 1: Create a Phone Check
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 var phoneCheck = apiManager.getPhoneCheck(phone)
                 println("phoneCheck " + phoneCheck)
+                val currentTime = System.currentTimeMillis()
                 withContext(Dispatchers.Main) {
-                    view.apply { text = "check url" }
+                    view.apply { text = "- Initiating Phone Verification\n- Creating Mobile Data Session [".plus(currentTime-startTime).plus("]") }
                 }
 
+                // Step 2: Open the check_url
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
                         redirectManager.openCheckUrl(phoneCheck.check_url)
                         println("redirect done ")
+                        val currentTime = System.currentTimeMillis()
                         withContext(Dispatchers.Main) {
-                            view.apply { text = "redirect done" }
+                            view.apply { text = view.text.toString().plus("\n- Retrieving Result [").plus(currentTime-startTime).plus("]") }
                         }
 
+                        // Step 3: Get Phone Check Result
                         CoroutineScope(Dispatchers.IO).launch {
                             try {
                                 var phoneCheckResult = apiManager.getPhoneCheckResult(phoneCheck.check_id)
                                 println("phoneCheckResult  " + phoneCheckResult)
+                                val currentTime = System.currentTimeMillis()
                                 withContext(Dispatchers.Main) {
                                     load.visibility = View.GONE;
                                     if (phoneCheckResult.match) {
-                                        view.apply { text = "OK" }
+                                        view.apply { text =  view.text.toString().plus("\n- Phone Number match: true [").plus(currentTime-startTime).plus("]") }
                                     } else {
-                                        view.apply { text = "Failed" }
+                                        view.apply { text = view.text.toString().plus("\n- Phone Number match: failed [").plus(currentTime-startTime).plus("]") }
                                     }
                                 }
                             } catch (e: Throwable) {
                                 println("exception caught $e")
+                                view.apply { text = "- Error " }
                             }
 
                         }
 
                     } catch (e: Throwable) {
                         println("exception caught $e")
+                        view.apply { text = "- Error " }
                     }
-
                 }
-
-
             } catch (e: Throwable) {
                 println("exception caught $e")
+                view.apply { text = "- Error " }
                 load.visibility = View.GONE;
             }
         }

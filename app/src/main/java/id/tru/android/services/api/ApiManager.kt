@@ -16,7 +16,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class ApiManager {
-    private val AUTH_ENDPOINT : String = System.getenv("AUTH_ENDPOINT") ?: "https://4f4ae67cf840.ngrok.io/rta/0/phone_check"
+    private val AUTH_ENDPOINT : String = System.getenv("AUTH_ENDPOINT") ?: "https://rta.tru.id/rta/0/phone_check"
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val phoneCheckPostJsonAdapter: JsonAdapter<PhoneCheckPost> = moshi.adapter(PhoneCheckPost::class.java)
 
