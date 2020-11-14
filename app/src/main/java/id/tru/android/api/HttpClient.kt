@@ -1,4 +1,4 @@
-package id.tru.android.services.network
+package id.tru.android.api
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -16,7 +16,7 @@ import okio.IOException
 
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-class Client private constructor(context: Context) {
+class HttpClient private constructor(context: Context) {
 
     private val context = context
     private val client = OkHttpClient()
@@ -86,23 +86,25 @@ class Client private constructor(context: Context) {
     }
 
     companion object {
-        private var instance: Client? = null
+        private var instance: HttpClient? = null
 
         @Synchronized
-        fun setContext(context: Context): Client {
-            var currentInstance = instance
+        fun setContext(context: Context): HttpClient {
+            var currentInstance =
+                instance
             if (null == currentInstance) {
-                currentInstance = Client(context)
+                currentInstance = HttpClient(context)
             }
             instance = currentInstance
             return currentInstance
         }
 
         @Synchronized
-        fun getInstance(): Client {
-            var currentInstance = instance
+        fun getInstance(): HttpClient {
+            var currentInstance =
+                instance
             checkNotNull(currentInstance) {
-                Client::class.java.simpleName +
+                HttpClient::class.java.simpleName +
                         " is not initialized, call getInstance(...) first"
             }
             return currentInstance

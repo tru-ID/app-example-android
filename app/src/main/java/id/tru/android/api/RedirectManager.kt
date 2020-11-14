@@ -1,4 +1,4 @@
-package id.tru.android.services.api
+package id.tru.android.api
 
 import android.util.Log
 import id.tru.sdk.TruSDK

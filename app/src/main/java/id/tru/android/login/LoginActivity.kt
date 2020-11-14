@@ -9,9 +9,9 @@ import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import id.tru.android.R
-import id.tru.android.services.api.ApiManager
-import id.tru.android.services.api.RedirectManager
-import id.tru.android.services.network.Client
+import id.tru.android.api.ApiManager
+import id.tru.android.api.RedirectManager
+import id.tru.android.api.HttpClient
 import id.tru.sdk.TruSDK
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Client.setContext(this.applicationContext)
+        HttpClient.setContext(this.applicationContext)
         TruSDK.initializeSdk(this.applicationContext)
 
         setContentView(R.layout.activity_login)
