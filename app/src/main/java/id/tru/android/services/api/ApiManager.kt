@@ -3,20 +3,20 @@ package id.tru.android.services.api
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import id.tru.android.data.model.PhoneCheck
-import id.tru.android.data.model.PhoneCheckPost
-import id.tru.android.data.model.PhoneCheckResult
 import java.lang.Exception
 import id.tru.android.services.adapters.PhoneCheckAdapter
 import id.tru.android.services.network.Client
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import id.tru.android.services.adapters.PhoneCheck
+import id.tru.android.services.adapters.PhoneCheckPost
+import id.tru.android.services.adapters.PhoneCheckResult
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class ApiManager {
-    private val AUTH_ENDPOINT : String = System.getenv("AUTH_ENDPOINT") ?: "https://rta.tru.id/rta/0/phone_check"
+    private val AUTH_ENDPOINT : String = System.getenv("AUTH_ENDPOINT") ?: "https://4f4ae67cf840.ngrok.io/rta/0/phone_check"
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val phoneCheckPostJsonAdapter: JsonAdapter<PhoneCheckPost> = moshi.adapter(PhoneCheckPost::class.java)
 

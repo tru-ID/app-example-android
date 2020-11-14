@@ -18,31 +18,30 @@
         android:layout_height="48dp"
         android:layout_gravity="start"
         android:layout_marginStart="48dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="48dp"
-        android:layout_marginBottom="24dp"
-        android:background="#000000"
-        android:enabled="false"
+        android:background="#1E80F0"
+        android:enabled="true"
+        android:onClick="sendMessage"
         android:text="@string/action_sign_in"
         android:textColor="#FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintHorizontal_bias="0.523"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/loadingView"
-        app:layout_constraintVertical_bias="0.86" />
+        app:layout_constraintTop_toBottomOf="@+id/phone_number" />
 
     <EditText
         android:id="@+id/phone_number"
         android:layout_width="267dp"
         android:layout_height="58dp"
-        android:layout_marginTop="66dp"
+        android:layout_marginTop="60dp"
         android:ems="10"
         android:gravity="center_horizontal|center_vertical"
-        android:inputType="phone"
         android:hint="Phone number"
+        android:inputType="phone"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.507"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
@@ -50,7 +49,7 @@
         android:id="@+id/textView"
         android:layout_width="219dp"
         android:layout_height="77dp"
-        android:layout_marginTop="118dp"
+        android:layout_marginTop="36dp"
         android:gravity="center_horizontal"
         android:text="@string/prompt_phone_number"
         android:textColor="#000"
@@ -65,23 +64,33 @@
         android:layout_height="0dp"
         android:background="#FFFFFF"
         android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ProgressBar
-            android:id="@+id/loading"
-            android:layout_width="61dp"
-            android:layout_height="35dp"
-            android:layout_gravity="center"
-            android:background="#FFFFFF"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.53"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.726" />
     </FrameLayout>
+
+    <TextView
+        android:id="@+id/resultView"
+        android:layout_width="247dp"
+        android:layout_height="117dp"
+        android:layout_marginTop="138dp"
+        android:text=""
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.595"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:background="#FFFFFF"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

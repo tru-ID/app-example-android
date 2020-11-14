@@ -72,12 +72,13 @@ class Client private constructor(context: Context) {
             .method(method, body).addHeader("x-rta", "change_me")
             .url(url)
             .build()
+        println("request to $url -> "+request)
 
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
             val rawResponse = response.body!!.string()
-            println("Response to $url")
+            println("Response from $url")
             println(rawResponse)
 
             return rawResponse
