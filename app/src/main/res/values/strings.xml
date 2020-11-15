@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Android Sample</string>
+    <string name="app_name">Sample</string>
     <!-- Strings related to login -->
     <string name="prompt_phone_number">tru.ID</string>
     <string name="action_sign_in">Verify my phone number</string>
