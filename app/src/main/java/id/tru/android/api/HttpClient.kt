@@ -69,7 +69,26 @@ class HttpClient private constructor(context: Context) {
 
     fun requestSync(url: String, method: String, body: RequestBody?=null): String {
         val request = Request.Builder()
-            .method(method, body).addHeader("x-rta", "change_me")
+            .method(method, body)
+            .url(url)
+            .build()
+        println("request to $url -> "+request)
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+            val rawResponse = response.body!!.string()
+            println("Response from $url")
+            println(rawResponse)
+
+            return rawResponse
+        }
+    }
+
+    fun requestSync(url: String, method: String, headerName: String, headerValue: String, body: RequestBody?=null): String {
+        val request = Request.Builder()
+            .method(method, body)
+            .addHeader(headerName, headerValue)
             .url(url)
             .build()
         println("request to $url -> "+request)

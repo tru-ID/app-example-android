@@ -12,6 +12,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 class ApiManager {
     private val AUTH_ENDPOINT : String = System.getenv("AUTH_ENDPOINT") ?: "https://rta.tru.id/rta/0/phone_check"
+    private val AUTH_HEADER : String = System.getenv("AUTH_HEADER") ?: "change_me"
     private val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
     private val phoneCheckPostJsonAdapter: JsonAdapter<PhoneCheckPost> = moshi.adapter(
         PhoneCheckPost::class.java)
@@ -26,7 +27,7 @@ class ApiManager {
             PhoneCheckPost(phone_number = phoneNumber)
         val body = phoneCheckPostJsonAdapter.toJson(phoneCheckPost).toRequestBody(mediaType)
         val response = HttpClient.getInstance()
-            .requestSync(localPhoneCheckCreateUrl, method = "POST", body = body)
+            .requestSync(localPhoneCheckCreateUrl, method = "POST", headerName = "x-rta", headerValue = AUTH_HEADER, body = body)
         try {
             return PhoneCheckAdapter().parsePhoneCheckResponse(response)
         }
@@ -42,7 +43,7 @@ class ApiManager {
         var localPhoneCheckResultUrl = "$AUTH_ENDPOINT/check_status?check_id=$checkId"
         try {
             var response =  HttpClient.getInstance()
-                .requestSync(localPhoneCheckResultUrl, method = "GET")
+                .requestSync(localPhoneCheckResultUrl, method = "GET", headerName = "x-rta", headerValue = AUTH_HEADER)
             return PhoneCheckAdapter().parsePhoneCheckResults(response)
         } catch(error: Exception) {
             Log.println(Log.ERROR, "ApiManager", "Failed to retrieve phone check results: $error")
