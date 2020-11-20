@@ -7,7 +7,7 @@
 
 You will need:
 
-- Android capabile IDE e.g. [Android Studio](https://developer.android.com/studio)
+- Android capable IDE e.g. [Android Studio](https://developer.android.com/studio)
 - A [tru.ID Account](https://tru.id)
 - The [Server Example](https://github.com/tru-ID/server-example-node) & Node.JS installed
     - Follow the instructions within the 4Auth Node Server README
@@ -18,14 +18,14 @@ You will need:
 ## Getting Started
 
 - Clone or unzip the PhoneCheckExample into a directory.
-- Open the project with your Android Capabile IDE
+- Open the project with your Android Capable IDE
 - Connect your phone to your computer so it's used for running the PhoneCheckExample application
 - Turn off WiFi on your mobile device
 - Run the application from your IDE
 - Enter the phone number for the mobile device in the UI
-- Press the done keyboard key or touch the "Sign in" button
-- You will see a toast notification indicating the result of the Phone Check
-- Get in touch: please email feedback@4auth.io with any questions
+- Press the done keyboard key or touch the "Verify my phone number" button
+- You will see the result of the Phone Check
+- Get in touch: please email feedback@tru.id with any questions
 
 ## Notes
 
