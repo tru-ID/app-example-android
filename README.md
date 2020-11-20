@@ -11,23 +11,22 @@ You will need:
 - A [tru.ID Account](https://tru.id)
 - The Node.js installed and the [server example](https://github.com/tru-ID/server-example-node) running
     - Follow the instructions within the tru.ID example node.js server README
-    - A local tunnel solution such as [ngrok](https://ngrok.com/) when using a real mobile device
-    - The URL to the running [server](https://github.com/tru-ID/server-example-node) is configured via a variable named `AUTH_ENDPOINT`. It defaults to `http://10.0.2.2:4040`. Update to the ngrok URL.
+    - A local tunnel solution such as [ngrok](https://ngrok.com/)
 - An Android phone with a SIM card and mobile data connection
 
 ## Getting Started
 
+- Get the server example up and running
+- Run your local tunnel solution and tunnelling the requests to the running server
 - Clone or unzip the PhoneCheckExample into a directory.
 - Open the project with your Android Capable IDE
+- Update the `SERVER_BASE_URL` variable `app/build.gradle`
 - Connect your phone to your computer so it's used for running the PhoneCheckExample application
 - Run the application from your IDE
 - Enter the phone number for the mobile device in the UI
 - Press the done keyboard key or touch the "Verify my phone number" button
 - You will see the result of the Phone Check
 - Get in touch: please email feedback@tru.id with any questions
-
-## Notes
-
 
 ## References
 
@@ -42,9 +41,9 @@ You will need:
 
 ## Meta
 
-Distributed under the MIT license. See ``LICENSE`` for more information.
+Distributed under the MIT license. See [LICENSE](LICENSE.md) for more information.
 
-[https://github.com/tru-ID](https://github.com/tru-ID)
+[https://github.com/tru-ID][license-url]
 
 [license-image]: https://img.shields.io/badge/License-MIT-blue.svg
-[license-url]: LICENSE
+[license-url]: LICENSE.md
