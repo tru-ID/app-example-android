@@ -19,7 +19,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "SERVER_BASE_URL", "\"EXAMPLE_SERVER_BASE_URL\"")
+        }
         release {
+            buildConfigField("String", "SERVER_BASE_URL", "\"EXAMPLE_SERVER_BASE_URL\"")
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
