@@ -43,7 +43,7 @@ You will need:
 
 Distributed under the MIT license. See [LICENSE][license-url] for more information.
 
-[https://github.com/tru-ID][https://github.com/tru-ID]
+[https://github.com/tru-ID](https://github.com/tru-ID)
 
 [license-image]: https://img.shields.io/badge/License-MIT-blue.svg
 [license-url]: LICENSE.md
