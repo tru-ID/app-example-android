@@ -21,52 +21,6 @@ class HttpClient private constructor(context: Context) {
     private val context = context
     private val client = OkHttpClient()
 
-    init {
-        val capabilities = intArrayOf(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-        val transportTypes = intArrayOf(NetworkCapabilities.TRANSPORT_CELLULAR)
-        alwaysPreferNetworksWith(capabilities, transportTypes)
-    }
-
-    private fun alwaysPreferNetworksWith(
-        capabilities: IntArray,
-        transportTypes: IntArray
-    ) {
-        val request = NetworkRequest.Builder()
-
-        for (cap in capabilities) {
-            request.addCapability(cap)
-        }
-
-        for (trans in transportTypes) {
-            request.addTransportType(trans)
-        }
-        val connectivityManager =
-            context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.registerNetworkCallback(request.build(), object : NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                try {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                        ConnectivityManager.setProcessDefaultNetwork(network)
-                    } else {
-                        connectivityManager.bindProcessToNetwork(network)
-                    }
-                } catch (e: IllegalStateException) {
-                    Log.e(TAG, "ConnectivityManager.NetworkCallback.onAvailable: ", e)
-                }
-            }
-
-            override fun onLost(network: Network) {
-                super.onLost(network)
-                println("onLost: $network")
-            }
-            override fun onUnavailable() {
-                super.onUnavailable()
-                println("onUnavailable")
-            }
-
-        })
-    }
-
     fun requestSync(url: String, method: String, body: RequestBody?=null): String {
         val request = Request.Builder()
             .method(method, body)
