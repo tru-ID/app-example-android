@@ -7,7 +7,7 @@ class RedirectManager {
     private val truSdk = TruSDK.getInstance()
 
     fun openCheckUrl(phoneCheckUrl: String): String {
-        Log.println(Log.DEBUG, "RedirectManager", "Triggering open check url")
+        Log.d("RedirectManager", "Triggering open check url $phoneCheckUrl")
         return truSdk.openCheckUrl(phoneCheckUrl)
     }
 }
