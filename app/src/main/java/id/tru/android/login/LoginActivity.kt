@@ -5,10 +5,10 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import id.tru.android.R
-import id.tru.android.api.RedirectManager
 import id.tru.android.api.RetrofitBuilder
 import id.tru.android.data.PhoneCheck
 import id.tru.android.data.PhoneCheckPost
@@ -29,7 +29,6 @@ import kotlinx.coroutines.withContext
  */
 class LoginActivity : AppCompatActivity() {
 
-    private val redirectManager by lazy { RedirectManager() }
     private var startTime: Long = 0
     private lateinit var phoneCheck: PhoneCheck
 
@@ -46,6 +45,7 @@ class LoginActivity : AppCompatActivity() {
 
     /** Called when the user taps the Sign In button */
     fun initSignIn(view: View) {
+        login.isEnabled = false
         Log.d(TAG, "phoneNumber " + phone_number.text)
         // close virtual keyboard when sign in starts
         phone_number.onEditorAction(EditorInfo.IME_ACTION_DONE)
@@ -62,6 +62,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (!isPhoneNumberValid(phone_number.text.toString())) {
             step1_tv.text = getString(R.string.phone_check_step1_errror)
+            login.isEnabled = true
             return
         }
         progress_step1.check()
@@ -71,7 +72,8 @@ class LoginActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitBuilder.apiClient.getPhoneCheck(
-                    PhoneCheckPost(phone_number.text.toString()))
+                    PhoneCheckPost(phone_number.text.toString())
+                )
 
                 if (response.isSuccessful && response.body() != null) {
                     phoneCheck = response.body() as PhoneCheck
@@ -98,14 +100,21 @@ class LoginActivity : AppCompatActivity() {
 
     private fun openCheckURL() {
         CoroutineScope(Dispatchers.IO).launch {
-            redirectManager.openCheckUrl(phoneCheck.check_url)
+            Log.d("TruSDK", "Triggering open check url $phoneCheck.check_url")
+            val truSdk = TruSDK.getInstance()
+            val isExecutedOnCellular = truSdk.openCheckUrl(phoneCheck.check_url)
 
             val currentTime = System.currentTimeMillis()
             Log.d(TAG, "redirect done [" + (currentTime - startTime) + "ms]")
 
             withContext(Dispatchers.Main) {
                 step3.visibility = View.VISIBLE
-                progress_step3.check()
+                if (!isExecutedOnCellular) {
+                    step3_tv.text = "redirect was NOT on a Mobile Data Session"
+                    Log.d(TAG, "redirect was NOT on Cellular")
+                } else {
+                    progress_step3.check()
+                }
             }
 
             // Step 3: Get Phone Check Result
@@ -117,13 +126,15 @@ class LoginActivity : AppCompatActivity() {
     private fun getPhoneCheckResult() {
         CoroutineScope(Dispatchers.IO).launch {
             val response = RetrofitBuilder.apiClient.getPhoneCheckResult(phoneCheck.check_id)
-            if (response.isSuccessful && response.body() != null) {
-                val phoneCheckResult = response.body() as PhoneCheckResult
+            withContext(Dispatchers.Main) {
+                if (response.isSuccessful && response.body() != null) {
+                    val phoneCheckResult = response.body() as PhoneCheckResult
 
-                val currentTime = System.currentTimeMillis()
-                Log.d(TAG, "phoneCheckResult  $phoneCheckResult [" + (currentTime - startTime) + "ms]")
+                    val currentTime = System.currentTimeMillis()
+                    Log.d(TAG,
+                        "phoneCheckResult  $phoneCheckResult [" + (currentTime - startTime) + "ms]"
+                    )
 
-                withContext(Dispatchers.Main) {
                     if (phoneCheckResult.match) {
                         step4.visibility = View.VISIBLE
                         progress_step4.check()
@@ -132,7 +143,9 @@ class LoginActivity : AppCompatActivity() {
                         step4.visibility = View.VISIBLE
                         step4_tv.text = getString(R.string.phone_check_step4_error)
                     }
+
                 }
+                login.isEnabled = true
             }
         }
     }
@@ -158,7 +171,9 @@ class LoginActivity : AppCompatActivity() {
         withContext(Dispatchers.Main) {
             phone_number.setText("")
             loading_layout.visibility = View.INVISIBLE
-            // Toast "An error occurred. Please try again."
+            login.isEnabled = true
+            val toast = Toast.makeText(applicationContext, additionalInfo, Toast.LENGTH_LONG)
+            toast.show()
         }
     }
 
