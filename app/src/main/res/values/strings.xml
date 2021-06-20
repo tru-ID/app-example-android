@@ -5,15 +5,19 @@
     <string name="action_sign_in">Verify my phone number</string>
     <string name="action_sign_in_header">To experience tru.ID verification, please enter your phone number</string>
     <string name="welcome">Welcome !</string>
-    <string name="invalid_phone_number">Not a valid phone number</string>
     <string name="login_failed">"Phone number check failed"</string>
+    <string name="prompt_phone">Phone</string>
+    <string name="prompt_terms">I accept the Terms and Conditions</string>
+    <string name="prompt_tc_error">Term and Conditions must be accepted</string>
     <string name="hint_text">Phone number</string>
     <string name="helper_text">Phone number with country code</string>
+    <string name="invalid_phone_number">Invalid phone number !</string>
+    <string name="invalid_app_state">Invalid App State!</string>
     <!-- Phone check steps -->
     <string name="phone_check_step1">- Validating Phone Number Input</string>
-    <string name="phone_check_step1_errror">- Invalid phone number !</string>
     <string name="phone_check_step2">- Initiating Phone Verification</string>
     <string name="phone_check_step3">- Creating Mobile Data Session</string>
+    <string name="phone_check_step3_error">- Redirect was NOT on a Mobile Data Session</string>
     <string name="phone_check_step4">- Phone number match: true</string>
     <string name="phone_check_step4_error">- Phone number match: failed</string>
 </resources>
