@@ -3,11 +3,11 @@
     <!-- Strings related to login -->
     <string name="prompt_phone_number">tru.ID</string>
     <string name="action_sign_in">Verify my phone number</string>
-    <string name="action_sign_in_header">To experience tru.ID verification, please enter your phone number</string>
+    <string name="action_sign_in_header">In order to confirm your registration, please enter your phone number and check the box below.</string>
     <string name="welcome">Welcome !</string>
     <string name="login_failed">"Phone number check failed"</string>
     <string name="prompt_phone">Phone</string>
-    <string name="prompt_terms">I accept the Terms and Conditions</string>
+    <string name="prompt_terms">I confirm, I&quote;d like for tru.ID to verify my phone number with my carrier</string>
     <string name="prompt_tc_error">Term and Conditions must be accepted</string>
     <string name="hint_text">Phone number</string>
     <string name="helper_text">Phone number with country code</string>
