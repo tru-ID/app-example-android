@@ -44,12 +44,10 @@ class LoginActivity : AppCompatActivity() {
 
         val phone = binding.phone
         val tcAccepted = binding.tcAccepted
-        val tcLink = binding.tcLink
         val login = binding.login
         val loading = binding.loading
 
-        tcLink.text = Html.fromHtml("<a href='https://tru.id/terms'>tru.ID Terms and Conditions</a>")
-        tcLink.movementMethod = LinkMovementMethod.getInstance()
+        tcAccepted.movementMethod = LinkMovementMethod.getInstance()
 
         phoneCheckViewModel = ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
 

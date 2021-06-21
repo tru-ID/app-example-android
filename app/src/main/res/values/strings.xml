@@ -7,7 +7,7 @@
     <string name="welcome">Welcome !</string>
     <string name="login_failed">"Phone number check failed"</string>
     <string name="prompt_phone">Phone</string>
-    <string name="prompt_terms">I confirm, I&quote;d like for tru.ID to verify my phone number with my carrier</string>
+    <string name="prompt_terms">I agree with tru.ID <a href="https://tru.id/terms">terms</a> and <a href="https://tru.id/privacy">privacy</a> policy</string>
     <string name="prompt_tc_error">Term and Conditions must be accepted</string>
     <string name="hint_text">Phone number</string>
     <string name="helper_text">Phone number with country code</string>
