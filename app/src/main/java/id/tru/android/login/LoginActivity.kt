@@ -1,26 +1,27 @@
 package id.tru.android.login
 
+import android.app.Activity
 import android.os.Build
 import android.os.Bundle
+import android.text.Editable
+import android.text.Html
+import android.text.TextWatcher
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import id.tru.android.R
-import id.tru.android.api.RetrofitBuilder
-import id.tru.android.data.PhoneCheck
-import id.tru.android.data.PhoneCheckPost
-import id.tru.android.data.PhoneCheckResult
 import id.tru.android.databinding.ActivityLoginBinding
-import id.tru.android.util.isPhoneNumberValid
+import id.tru.android.model.Step
 import id.tru.sdk.TruSDK
-import kotlinx.android.synthetic.main.activity_login.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 /**
  * Add blazingly fast mobile phone verification to your app for 2FA or passwordless onboarding.
@@ -29,8 +30,8 @@ import kotlinx.coroutines.withContext
  */
 class LoginActivity : AppCompatActivity() {
 
-    private var startTime: Long = 0
-    private lateinit var phoneCheck: PhoneCheck
+    private lateinit var phoneCheckViewModel: PhoneCheckViewModel
+    private lateinit var binding: ActivityLoginBinding
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,148 +39,181 @@ class LoginActivity : AppCompatActivity() {
 
         TruSDK.initializeSdk(applicationContext)
 
-        val binding = ActivityLoginBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-    }
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-    /** Called when the user taps the Sign In button */
-    fun initSignIn(view: View) {
-        login.isEnabled = false
-        Log.d(TAG, "phoneNumber " + phone_number.text)
-        // close virtual keyboard when sign in starts
-        phone_number.onEditorAction(EditorInfo.IME_ACTION_DONE)
+        val phone = binding.phone
+        val tcAccepted = binding.tcAccepted
+        val login = binding.login
+        val loading = binding.loading
 
-        resetProgress()
-        createPhoneCheck()
-    }
+        tcAccepted.movementMethod = LinkMovementMethod.getInstance()
 
-    // region internal
+        phoneCheckViewModel = ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
 
-    // Step 1: Create a Phone Check
-    private fun createPhoneCheck() {
-        step1.visibility = View.VISIBLE
+        phoneCheckViewModel.verificationFormState.observe(this@LoginActivity, Observer {
+            val loginState = it ?: return@Observer
 
-        if (!isPhoneNumberValid(phone_number.text.toString())) {
-            step1_tv.text = getString(R.string.phone_check_step1_errror)
-            login.isEnabled = true
-            return
-        }
-        progress_step1.check()
-        step1_tv.text = getString(R.string.phone_check_step1)
-        startTime = System.currentTimeMillis()
+            // Disable login button unless both phone number is valid and user accepts the T&C
+            login.isEnabled = loginState.isDataValid
 
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = RetrofitBuilder.apiClient.getPhoneCheck(
-                    PhoneCheckPost(phone_number.text.toString())
-                )
-
-                if (response.isSuccessful && response.body() != null) {
-                    phoneCheck = response.body() as PhoneCheck
-
-                    val currentTime = System.currentTimeMillis()
-                    Log.d(TAG, "phoneCheck $phoneCheck [" + (currentTime - startTime) + "ms]")
-
-                    withContext(Dispatchers.Main) {
-                        step2.visibility = View.VISIBLE
-                        progress_step2.check()
-                    }
-
-                    // Step 2: Open the check_url
-                    openCheckURL()
-                } else {
-                    // Show API error.
-                    updateUIonError("Error Occurred: ${response.message()}")
-                }
-            } catch (e: Throwable) {
-                updateUIonError("exception caught $e")
+            if (loginState.tcNotAcceptedError != null) {
+                phone.error = getString(loginState.tcNotAcceptedError)
             }
-        }
-    }
 
-    private fun openCheckURL() {
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d("TruSDK", "Triggering open check url $phoneCheck.check_url")
-            val truSdk = TruSDK.getInstance()
-            val isExecutedOnCellular = truSdk.openCheckUrl(phoneCheck.check_url)
+            if (loginState.phoneNumberError != null) {
+                phone.error = getString(loginState.phoneNumberError)
+            }
+        })
 
-            val currentTime = System.currentTimeMillis()
-            Log.d(TAG, "redirect done [" + (currentTime - startTime) + "ms]")
+        phoneCheckViewModel.phoneCheckResult.observe(this@LoginActivity, Observer {
+            val result = it ?: return@Observer
+            //LiveData observers are always called on the main thread
 
-            withContext(Dispatchers.Main) {
-                step3.visibility = View.VISIBLE
-                if (!isExecutedOnCellular) {
-                    step3_tv.text = "redirect was NOT on a Mobile Data Session"
-                    Log.d(TAG, "redirect was NOT on Cellular")
-                } else {
-                    progress_step3.check()
+            result.progressUpdate?.let { triple ->
+
+                val (step, msgReference, shouldCheck) = triple
+                val msg = getString(msgReference)
+                when(step) {
+                    Step.FIRST -> {
+                        binding.progressStep1.visibility = View.VISIBLE
+                        binding.progressStep1.check()
+                        binding.step1Tv.text = msg //success or error msg
+                    }
+                    Step.SECOND -> {
+                        binding.step2.visibility = View.VISIBLE
+                        if (shouldCheck) binding.progressStep2.check()
+                        binding.step2Tv.text = msg
+                    }
+                    Step.THIRD -> {
+                        binding.step3.visibility = View.VISIBLE
+                        if (shouldCheck) binding.progressStep3.check()
+                        binding.step3Tv.text = msg //Either done on cellular or not
+                    }
+                    Step.FOURTH -> {
+                       binding.step4.visibility = View.VISIBLE
+                        if (shouldCheck) binding.progressStep4.check()
+                        binding.step4Tv.text = msg //success or error msg
+                    }
                 }
             }
 
-            // Step 3: Get Phone Check Result
-            getPhoneCheckResult()
-        }
-    }
-
-    // Step 3: Get Phone Check Result
-    private fun getPhoneCheckResult() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val response = RetrofitBuilder.apiClient.getPhoneCheckResult(phoneCheck.check_id)
-            withContext(Dispatchers.Main) {
-                if (response.isSuccessful && response.body() != null) {
-                    val phoneCheckResult = response.body() as PhoneCheckResult
-
-                    val currentTime = System.currentTimeMillis()
-                    Log.d(TAG,
-                        "phoneCheckResult  $phoneCheckResult [" + (currentTime - startTime) + "ms]"
-                    )
-
-                    if (phoneCheckResult.match) {
-                        step4.visibility = View.VISIBLE
-                        progress_step4.check()
-                        step4_tv.text = getString(R.string.phone_check_step4)
-                    } else {
-                        step4.visibility = View.VISIBLE
-                        step4_tv.text = getString(R.string.phone_check_step4_error)
-                    }
-
-                }
+            if (result.error != null || result.success != null) {
+                loading.visibility = View.GONE
                 login.isEnabled = true
+                result.error?.let { updateUIonError(result.error) }
+                result.success?.let { updateUIonSuccess(result.success) }
+                setResult(Activity.RESULT_OK)
+            }
+
+        })
+
+        tcAccepted.apply {
+            setOnCheckedChangeListener { buttonView, isChecked ->
+                phoneCheckViewModel.loginDataChanged(phone.text.toString(), tcAccepted = isChecked)
             }
         }
+
+        phone.apply {
+            afterTextChanged {
+                phoneCheckViewModel.loginDataChanged(phone.text.toString(), tcAccepted = tcAccepted.isChecked)
+            }
+
+            setOnEditorActionListener { _, actionId, _ ->
+                when (actionId) {
+                    EditorInfo.IME_ACTION_DONE -> phoneCheckViewModel.login(phone.text.toString())
+                }
+                false
+            }
+
+            /** Called when the user taps the Sign In button */
+            login.setOnClickListener {
+                loading.visibility = View.VISIBLE
+                login.isEnabled = false
+                resetProgress()
+                Log.d(TAG, "phoneNumber " + phone.text)
+                // close virtual keyboard when sign in starts
+                phone.onEditorAction(EditorInfo.IME_ACTION_DONE)
+            }
+        }
+
+//        phoneNumber.afterTextChanged {
+//            if (!isPhoneNumberValid(binding.phoneNumber.text.toString())) {
+//                binding.step1Tv.text = getString(R.string.phone_check_step1_errror)
+//                binding.loginButton.isEnabled = false
+//            }
+//        }
+//
+//        tcAccepted.apply {
+//            setOnCheckedChangeListener { buttonView, isChecked ->
+//                if (isPhoneNumberValid(binding.phoneNumber.text.toString()) && isChecked) {
+//                    binding.loginButton.isEnabled = isChecked
+//                }
+//            }
+//        }
     }
 
     private fun resetProgress() {
-        loading_layout.visibility = View.VISIBLE
+        binding.loadingLayout.visibility = View.VISIBLE
 
-        step1.visibility = View.INVISIBLE
-        step2.visibility = View.INVISIBLE
-        step3.visibility = View.INVISIBLE
-        step4.visibility = View.INVISIBLE
+        binding.step1.visibility = View.INVISIBLE
+        binding.step2.visibility = View.INVISIBLE
+        binding.step3.visibility = View.INVISIBLE
+        binding.step4.visibility = View.INVISIBLE
 
-        progress_step1.uncheck()
-        progress_step2.uncheck()
-        progress_step3.uncheck()
-        progress_step4.uncheck()
+        binding.progressStep1.uncheck()
+        binding.progressStep2.uncheck()
+        binding.progressStep3.uncheck()
+        binding.progressStep4.uncheck()
 
-        startTime = System.currentTimeMillis()
     }
 
-    private suspend fun updateUIonError(additionalInfo: String) {
+    private fun updateUIonError(additionalInfo: String) {
         Log.e(TAG, "$additionalInfo")
-        withContext(Dispatchers.Main) {
-            phone_number.setText("")
-            loading_layout.visibility = View.INVISIBLE
-            login.isEnabled = true
-            val toast = Toast.makeText(applicationContext, additionalInfo, Toast.LENGTH_LONG)
-            toast.show()
-        }
+        binding.phone.setText("")
+        Toast.makeText(
+            applicationContext,
+            additionalInfo,
+            Toast.LENGTH_LONG
+        ).show()
+    }
+
+    private fun updateUIonError(@StringRes errorString: Int) {
+        Toast.makeText(
+            applicationContext,
+            errorString,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun updateUIonSuccess(model: VerifiedPhoneNumberView) {
+        val welcome = getString(R.string.welcome)
+        // TODO : initiate successful logged in experience
+        Toast.makeText(
+            applicationContext,
+            "$welcome $model.phoneNumber",
+            Toast.LENGTH_LONG,
+        ).show()
     }
 
     companion object {
         private const val TAG = "LoginActivity"
     }
-    // endregion internal
+}
+
+/**
+ * Extension function to simplify setting an afterTextChanged action to EditText components.
+ */
+fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+    this.addTextChangedListener(object : TextWatcher {
+
+        override fun afterTextChanged(editable: Editable?) {
+            afterTextChanged.invoke(editable.toString())
+        }
+
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+    })
 }
 

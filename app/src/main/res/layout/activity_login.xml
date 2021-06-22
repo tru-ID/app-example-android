@@ -13,9 +13,11 @@
         android:id="@+id/logo"
         android:layout_width="200dp"
         android:layout_height="150dp"
+        android:layout_marginTop="4dp"
         android:gravity="center_horizontal"
         android:src="@drawable/bitmap"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -43,7 +45,7 @@
         app:layout_constraintTop_toBottomOf="@+id/sign_in_header">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/phone_number"
+            android:id="@+id/phone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -62,37 +64,47 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:background="@color/colorPrimary"
-        android:onClick="initSignIn"
         android:text="@string/action_sign_in"
-        android:textAllCaps="false"
+        android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/input_layout"
+        android:textAllCaps="false"
+        android:enabled="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/loading_layout"
-        app:layout_constraintVertical_bias="0.698" />
+        app:layout_constraintTop_toBottomOf="@+id/input_layout" />
+
+    <CheckBox
+        android:id="@+id/tcAccepted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/prompt_terms"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login" />
+
 
     <LinearLayout
         android:id="@+id/loading_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/layout_margin_l"
+        android:layout_marginBottom="12dp"
         android:orientation="vertical"
         android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login">
+        app:layout_constraintTop_toBottomOf="@+id/tcAccepted"
+        app:layout_constraintVertical_bias="0.30">
 
         <LinearLayout
             android:id="@+id/step1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_s"
             android:orientation="horizontal"
             android:visibility="gone"
-            tools:visibility="visible"
-            android:layout_marginTop="@dimen/layout_margin_s">
+            tools:visibility="visible">
 
             <cdflynn.android.library.checkview.CheckView
                 android:id="@+id/progress_step1"
@@ -105,85 +117,100 @@
                 android:id="@+id/step1_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/phone_check_step1"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/layout_margin_xs"/>
+                android:layout_marginLeft="@dimen/layout_margin_xs"
+                android:text="@string/phone_check_step1" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/step2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_s"
             android:orientation="horizontal"
             android:visibility="gone"
-            tools:visibility="visible"
-            android:layout_marginTop="@dimen/layout_margin_s">
+            tools:visibility="visible">
 
             <cdflynn.android.library.checkview.CheckView
                 android:id="@+id/progress_step2"
                 android:layout_width="@dimen/check_size"
                 android:layout_height="@dimen/check_size"
                 app:checkView_strokeColor="@color/green"
-                app:checkView_strokeWidth="@dimen/check_stroke_width"/>
+                app:checkView_strokeWidth="@dimen/check_stroke_width" />
 
             <TextView
                 android:id="@+id/step2_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/phone_check_step2"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/layout_margin_xs"/>
+                android:layout_marginLeft="@dimen/layout_margin_xs"
+                android:text="@string/phone_check_step2" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/step3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_margin_s"
             android:orientation="horizontal"
             android:visibility="gone"
-            tools:visibility="visible"
-            android:layout_marginTop="@dimen/layout_margin_s">
+            tools:visibility="visible">
 
             <cdflynn.android.library.checkview.CheckView
                 android:id="@+id/progress_step3"
                 android:layout_width="@dimen/check_size"
                 android:layout_height="@dimen/check_size"
                 app:checkView_strokeColor="@color/green"
-                app:checkView_strokeWidth="@dimen/check_stroke_width"/>
+                app:checkView_strokeWidth="@dimen/check_stroke_width" />
 
             <TextView
                 android:id="@+id/step3_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/phone_check_step3"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/layout_margin_xs"/>
+                android:layout_marginLeft="@dimen/layout_margin_xs"
+                android:text="@string/phone_check_step3" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/step4"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginTop="@dimen/layout_margin_s"
             android:orientation="horizontal"
             android:visibility="gone"
-            tools:visibility="visible"
-            android:layout_marginTop="@dimen/layout_margin_s">
+            tools:visibility="visible">
 
             <cdflynn.android.library.checkview.CheckView
                 android:id="@+id/progress_step4"
                 android:layout_width="@dimen/check_size"
                 android:layout_height="@dimen/check_size"
                 app:checkView_strokeColor="@color/green"
-                app:checkView_strokeWidth="@dimen/check_stroke_width"/>
+                app:checkView_strokeWidth="@dimen/check_stroke_width" />
 
             <TextView
                 android:id="@+id/step4_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/phone_check_step4"
                 android:layout_gravity="center_vertical"
-                android:layout_marginLeft="@dimen/layout_margin_xs"/>
+                android:layout_marginLeft="@dimen/layout_margin_xs"
+                android:text="@string/phone_check_step4" />
         </LinearLayout>
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="64dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/login"
+        app:layout_constraintStart_toStartOf="@+id/login"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
 </androidx.constraintlayout.widget.ConstraintLayout>

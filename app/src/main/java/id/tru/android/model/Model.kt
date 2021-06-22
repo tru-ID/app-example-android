@@ -1,4 +1,4 @@
-package id.tru.android.data
+package id.tru.android.model
 
 import com.google.gson.annotations.SerializedName
 

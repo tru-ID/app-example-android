@@ -1,8 +1,8 @@
 package id.tru.android.api
 
-import id.tru.android.data.PhoneCheck
-import id.tru.android.data.PhoneCheckPost
-import id.tru.android.data.PhoneCheckResult
+import id.tru.android.model.PhoneCheck
+import id.tru.android.model.PhoneCheckPost
+import id.tru.android.model.PhoneCheckResult
 import retrofit2.Response
 import retrofit2.http.*
 
