@@ -46,7 +46,7 @@ class PhoneCheckViewModel(private val phoneCheckRepository: PhoneCheckRepository
     }
 
     fun loginDataChanged(phoneNumber: String, tcAccepted: Boolean) {
-        if (phoneNumber.length == 13 && tcAccepted) {
+        if (tcAccepted) {
             if (isPhoneNumberValid(phoneNumber)) {
                 _verificationFormState.value = VerificationFormState(isDataValid = true)
             } else {
@@ -58,9 +58,7 @@ class PhoneCheckViewModel(private val phoneCheckRepository: PhoneCheckRepository
     }
 
     private fun isPhoneNumberValid(phoneNumber: String): Boolean {
-        return if (phoneNumber.contains('+')) {
-            Patterns.PHONE.matcher(phoneNumber).matches()
-        } else { false }
+        return Patterns.PHONE.matcher(phoneNumber).matches()
     }
 
     companion object {

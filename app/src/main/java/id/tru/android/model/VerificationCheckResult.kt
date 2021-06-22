@@ -9,7 +9,6 @@ data class VerificationCheckResult(
     val success: VerifiedPhoneNumberView? = null,
     val progressUpdate: Triple<Step, Int, Boolean>? = null,
     val error: Int? = null
-// You would need steps here.
 )
 
 enum class Step {
