@@ -11,9 +11,10 @@
     <string name="prompt_tc_error">Term and Conditions must be accepted</string>
     <string name="hint_text">Phone number</string>
     <string name="helper_text">Phone number with country code</string>
-    <string name="invalid_phone_number">Invalid phone number !</string>
+    <string name="invalid_phone_number">Invalid phone number!</string>
     <string name="invalid_app_state">Invalid App State!</string>
     <!-- Phone check steps -->
+    <string name="phone_check_step0">- Finding Device IP</string>
     <string name="phone_check_step1">- Validating Phone Number Input</string>
     <string name="phone_check_step2">- Initiating Phone Verification</string>
     <string name="phone_check_step3">- Creating Mobile Data Session</string>

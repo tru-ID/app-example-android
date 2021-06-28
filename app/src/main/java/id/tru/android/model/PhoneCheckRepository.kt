@@ -22,10 +22,24 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
             var startTime: Long = System.currentTimeMillis()
             var currentTime: Long = 0
 
-            // Here - Signal Step1 Update
+            // Signal Step0 Update
+            dataSourcePhoneCheckResult.postValue(VerificationCheckResult(
+                progressUpdate = Triple(Step.FIRST, R.string.phone_check_step0,true)))
+
+            // Step 0 (optional): Find Device IP
+            val reachabilityDetails = dataSource.isReachable()
+            if (reachabilityDetails != null) {
+                reachabilityDetails?.let {
+                    Log.d(TAG, "Reachability: Network Name =>" + it.networkName)
+                    Log.d(TAG, "Error:" + it.error.toString())
+                }
+            } else {
+                Log.d(TAG, "No reachability details provided")
+            }
+
+            // Signal Step1 Update
             dataSourcePhoneCheckResult.postValue(VerificationCheckResult(
                 progressUpdate = Triple(Step.FIRST, R.string.phone_check_step1,true)))
-
             // Step 1: Create Phone Check
             // Blocking network request code
             var checkResult = dataSource.createPhoneCheck(phoneNumber)
