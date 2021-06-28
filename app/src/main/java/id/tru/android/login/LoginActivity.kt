@@ -4,7 +4,6 @@ import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
-import android.text.Html
 import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.util.Log
@@ -36,8 +35,6 @@ class LoginActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        TruSDK.initializeSdk(applicationContext)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -136,21 +133,12 @@ class LoginActivity : AppCompatActivity() {
                 phone.onEditorAction(EditorInfo.IME_ACTION_DONE)
             }
         }
+    }
 
-//        phoneNumber.afterTextChanged {
-//            if (!isPhoneNumberValid(binding.phoneNumber.text.toString())) {
-//                binding.step1Tv.text = getString(R.string.phone_check_step1_errror)
-//                binding.loginButton.isEnabled = false
-//            }
-//        }
-//
-//        tcAccepted.apply {
-//            setOnCheckedChangeListener { buttonView, isChecked ->
-//                if (isPhoneNumberValid(binding.phoneNumber.text.toString()) && isChecked) {
-//                    binding.loginButton.isEnabled = isChecked
-//                }
-//            }
-//        }
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "onResume: TruSDK is being initialised")
+        TruSDK.initializeSdk(applicationContext)
     }
 
     private fun resetProgress() {

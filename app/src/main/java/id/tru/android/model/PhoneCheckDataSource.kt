@@ -2,24 +2,17 @@ package id.tru.android.model
 
 import android.util.Log
 import id.tru.android.api.RetrofitBuilder
+import id.tru.sdk.ReachabilityDetails
 import id.tru.sdk.TruSDK
+import id.tru.sdk.network.TraceInfo
 import java.io.IOException
+import java.net.URL
 import java.util.*
 
 /**
  * Class that handles phone check
  */
 class PhoneCheckDataSource {
-
-    // MOCK
-    fun login(phoneNumber: String): Result<VerifiedPhoneNumber> {
-        return try {
-            val fakeUser = VerifiedPhoneNumber(UUID.randomUUID().toString())
-            Result.Success(fakeUser)
-        } catch (e: Throwable) {
-            Result.Error(IOException("Error logging in", e))
-        }
-    }
 
     // Step 1: Create a Phone Check
     @Throws(Exception::class)
@@ -51,6 +44,27 @@ class PhoneCheckDataSource {
         } else {
             Result.Error(Exception("HTTP Error getting phone check results"))
         }
+    }
+
+    @Throws(Exception::class)
+    suspend fun checkWithTrace(checkURL: String): TraceInfo {
+        Log.d("TruSDK", "Triggering checkWithTrace url $checkURL")
+        val truSdk = TruSDK.getInstance()
+        return truSdk.checkWithTrace(URL(checkURL))
+    }
+
+    @Throws(Exception::class)
+    fun isReachable(): ReachabilityDetails? {
+        Log.d("TruSDK", "Triggering isReachable")
+        val truSdk = TruSDK.getInstance()
+        return truSdk.isReachable()
+    }
+
+    @Throws(Exception::class)
+    fun getJSON(): String? {
+        val baseURL = "https://tidy-crab-73.loca.lt/my-ip"
+        val truSdk = TruSDK.getInstance()
+        return truSdk.getJsonPropertyValue(baseURL, "ip_address")
     }
 
     companion object {
