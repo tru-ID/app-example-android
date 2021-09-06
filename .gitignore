@@ -31,3 +31,12 @@ ktlint
 
 # Example app properties
 app/tru.properties
+.classpath
+.project
+.settings
+.vscode
+app/.classpath
+app/.classpath
+app/.settings
+app/.project
+
