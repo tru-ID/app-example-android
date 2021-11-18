@@ -26,16 +26,20 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
             dataSourcePhoneCheckResult.postValue(VerificationCheckResult(
                 progressUpdate = Triple(Step.FIRST, R.string.phone_check_step0,true)))
 
-            // Step 0 (optional): Find Device IP
-            val reachabilityDetails = dataSource.isReachable()
-            if (reachabilityDetails != null) {
-                reachabilityDetails?.let {
-                    Log.d(TAG, "Reachability: Network Name =>" + it.networkName)
-                    Log.d(TAG, "Error:" + it.error.toString())
-                }
-            } else {
-                Log.d(TAG, "No reachability details provided")
-            }
+            // Step 0 (optional): Reachability
+            // Uncomment the following code block, if you want to try our reachability API 
+            // this call should be done earlier on in the flow in order to determine if tru.ID 
+            // service is available for the device's Mobile Network Operator.
+
+            // val reachabilityDetails = dataSource.isReachable()
+            // if (reachabilityDetails != null) {
+            //     reachabilityDetails?.let {
+            //         Log.d(TAG, "Reachability: Network Name =>" + it.networkName)
+            //         Log.d(TAG, "Error:" + it.error.toString())
+            //     }
+            // } else {
+            //     Log.d(TAG, "No reachability details provided")
+            // }
 
             // Signal Step1 Update
             dataSourcePhoneCheckResult.postValue(VerificationCheckResult(
