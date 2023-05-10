@@ -1,13 +1,15 @@
 package id.tru.android.model
 
 import android.util.Log
+import id.tru.android.BuildConfig
 import id.tru.android.api.RetrofitBuilder
-import id.tru.sdk.ReachabilityDetails
 import id.tru.sdk.TruSDK
+import org.json.JSONObject
 import id.tru.sdk.network.TraceInfo
 import java.io.IOException
 import java.net.URL
 import java.util.*
+import java.security.MessageDigest
 
 /**
  * Class that handles phone check
@@ -17,7 +19,7 @@ class PhoneCheckDataSource {
     // Step 1: Create a Phone Check
     @Throws(Exception::class)
     suspend fun createPhoneCheck(phone: String): Result<PhoneCheck> {
-        val response = RetrofitBuilder.apiClient.getPhoneCheck(PhoneCheckPost(phone))
+        val response = RetrofitBuilder.apiClient.getPhoneCheck(getHeaderMap(phone),PhoneCheckPost(phone))
         return if (response.isSuccessful && response.body() != null) {
             val phoneCheck = response.body() as PhoneCheck
             Result.Success(phoneCheck)
@@ -28,16 +30,29 @@ class PhoneCheckDataSource {
 
     // Step 2: Check URL
     @Throws(Exception::class)
-    suspend fun openCheckURL(checkURL: String): Boolean {
+    suspend fun openCheckURL(checkURL: String): JSONObject {
         Log.d("TruSDK", "Triggering open check url $checkURL")
         val truSdk = TruSDK.getInstance()
-        return truSdk.openCheckUrl(checkURL)
+        return truSdk.openWithDataCellular(URL(checkURL),true)
+    }
+
+    // Step 3: Exchange Code
+    @Throws(Exception::class)
+    suspend fun exchangePhoneCheck(checkId: String, code: String, referenceId: String): Result<PhoneCheckResult> {
+        Log.d("TruSDK", "Exchange code for phone check")
+        val response = RetrofitBuilder.apiClient.getExchangePhoneCheck(getHeaderMap(checkId),checkId, code, referenceId, PhoneCheckExchange(checkId,code,referenceId) )
+        return if (response.isSuccessful && response.body() != null) {
+            val phoneCheckResult = response.body() as PhoneCheckResult
+            Result.Success(phoneCheckResult)
+        } else {
+            Result.Error(Exception("Error in exchanging code"))
+        }
     }
 
     // Step 3: Get Phone Check Result
     @Throws(Exception::class)
     suspend fun retrievePhoneCheckResult(checkID: String): Result<PhoneCheckResult> {
-        val response = RetrofitBuilder.apiClient.getPhoneCheckResult(checkID)
+        val response = RetrofitBuilder.apiClient.getPhoneCheckResult(getHeaderMap(checkID),checkID)
         return if(response.isSuccessful && response.body() != null) {
             val phoneCheckResult = response.body() as PhoneCheckResult
             Result.Success(phoneCheckResult)
@@ -47,24 +62,34 @@ class PhoneCheckDataSource {
     }
 
     @Throws(Exception::class)
-    suspend fun checkWithTrace(checkURL: String): TraceInfo {
-        Log.d("TruSDK", "Triggering checkWithTrace url $checkURL")
-        val truSdk = TruSDK.getInstance()
-        return truSdk.checkWithTrace(URL(checkURL))
+    suspend fun isReachable(url: String): JSONObject {
+        val response = RetrofitBuilder.apiClientRta.getCoverageAccessToken(getHeaderMap(""))
+        return if(response.isSuccessful && response.body() != null) {
+            val token = response.body() as Token
+            Log.d("TruSDK", "Triggering isReachable")
+            val truSdk = TruSDK.getInstance()
+            return truSdk.openWithDataCellularAndAccessToken(URL(url),token.accessToken, false)
+        } else {
+            val json =  JSONObject()
+            json.put("error", "forbidden")
+            json.put("error_description", "no coverage access token")
+            return json
+        }
     }
-
-    @Throws(Exception::class)
-    fun isReachable(): ReachabilityDetails? {
-        Log.d("TruSDK", "Triggering isReachable")
-        val truSdk = TruSDK.getInstance()
-        return truSdk.isReachable()
+    private fun getHeaderMap(v: String?): Map<String, String> {
+        val headerMap = mutableMapOf<String, String>()
+        headerMap["Content-Type"] = "application/json"
+        if (v!=null)
+            headerMap["x-rta"] = (BuildConfig.SERVER_AUTH_HEADER+v).sha256()
+        else
+            headerMap["x-rta"] =  BuildConfig.SERVER_AUTH_HEADER
+        return headerMap
     }
-
-    @Throws(Exception::class)
-    fun getJSON(): String? {
-        val baseURL = "https://tidy-crab-73.loca.lt/my-ip"
-        val truSdk = TruSDK.getInstance()
-        return truSdk.getJsonPropertyValue(baseURL, "ip_address")
+    private fun String.sha256(): String {
+        return MessageDigest
+            .getInstance("SHA-256")
+            .digest(this.toByteArray())
+            .fold("", { str, it -> str + "%02x".format(it) })
     }
 
     companion object {

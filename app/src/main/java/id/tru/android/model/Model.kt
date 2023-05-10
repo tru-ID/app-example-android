@@ -7,6 +7,15 @@ data class PhoneCheckPost(
     val phone_number: String
 )
 
+data class PhoneCheckExchange(
+    @SerializedName("check_id")
+    val check_id: String,
+    @SerializedName("code")
+    val code: String,
+    @SerializedName("reference_id")
+    val reference_id: String
+)
+
 data class PhoneCheck(
     @SerializedName("check_url")
     val check_url: String,
@@ -19,4 +28,9 @@ data class PhoneCheckResult(
     val match: Boolean,
     @SerializedName("check_id")
     val check_id: String
+)
+
+data class Token(
+    @SerializedName("access_token")
+    val accessToken: String
 )
