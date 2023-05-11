@@ -29,7 +29,6 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
                     progressUpdate = Triple(Step.FIRST, R.string.phone_check_step0, true)
                 )
             )
-
             // Step 0 (optional): Find Device IP
             val resp = dataSource.isReachable("https://eu.api.tru.id/coverage/v0.1/device_ip")
             if (resp.optString("error") != "") {

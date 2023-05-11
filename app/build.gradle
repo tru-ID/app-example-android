@@ -20,8 +20,6 @@ android {
 
         // Consult the README on instructions for setting up SERVER_BASE_URL
         buildConfigField("String", "SERVER_BASE_URL", props.getProperty("EXAMPLE_SERVER_BASE_URL"))
-        buildConfigField("String", "SERVER_RTA_BASE_URL", props.getProperty("EXAMPLE_SERVER_RTA_BASE_URL"))
-        buildConfigField("String", "SERVER_AUTH_HEADER", props.getProperty("EXAMPLE_SERVER_AUTH_HEADER"))
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

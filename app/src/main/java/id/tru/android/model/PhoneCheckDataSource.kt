@@ -1,15 +1,12 @@
 package id.tru.android.model
 
 import android.util.Log
-import id.tru.android.BuildConfig
 import id.tru.android.api.RetrofitBuilder
 import id.tru.sdk.TruSDK
 import org.json.JSONObject
-import id.tru.sdk.network.TraceInfo
 import java.io.IOException
 import java.net.URL
 import java.util.*
-import java.security.MessageDigest
 
 /**
  * Class that handles phone check
@@ -63,12 +60,11 @@ class PhoneCheckDataSource {
 
     @Throws(Exception::class)
     suspend fun isReachable(url: String): JSONObject {
-        val response = RetrofitBuilder.apiClientRta.getCoverageAccessToken(getHeaderMap(""))
-        return if(response.isSuccessful && response.body() != null) {
+        val response = RetrofitBuilder.apiClient.getCoverageAccessToken(getHeaderMap(""))
+        return if(response.isSuccessful && response.code() == 200) {
             val token = response.body() as Token
-            Log.d("TruSDK", "Triggering isReachable")
             val truSdk = TruSDK.getInstance()
-            return truSdk.openWithDataCellularAndAccessToken(URL(url),token.accessToken, false)
+            return truSdk.openWithDataCellularAndAccessToken(URL(url),token.token, false)
         } else {
             val json =  JSONObject()
             json.put("error", "forbidden")
@@ -76,21 +72,13 @@ class PhoneCheckDataSource {
             return json
         }
     }
+
     private fun getHeaderMap(v: String?): Map<String, String> {
         val headerMap = mutableMapOf<String, String>()
         headerMap["Content-Type"] = "application/json"
-        if (v!=null)
-            headerMap["x-rta"] = (BuildConfig.SERVER_AUTH_HEADER+v).sha256()
-        else
-            headerMap["x-rta"] =  BuildConfig.SERVER_AUTH_HEADER
         return headerMap
     }
-    private fun String.sha256(): String {
-        return MessageDigest
-            .getInstance("SHA-256")
-            .digest(this.toByteArray())
-            .fold("", { str, it -> str + "%02x".format(it) })
-    }
+
 
     companion object {
         private const val TAG = "PhoneCheckActivity"

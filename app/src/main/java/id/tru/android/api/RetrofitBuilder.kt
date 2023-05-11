@@ -25,23 +25,5 @@ object RetrofitBuilder {
             .build()
             .create(ApiService::class.java)
     }
-    val apiClientRta: ApiService by lazy {
-
-        val httpLoggingInterceptor = HttpLoggingInterceptor()
-        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        val okHttpClient = OkHttpClient()
-            .newBuilder()
-            //httpLogging interceptor for logging network requests
-            .addInterceptor(httpLoggingInterceptor)
-            .build()
-
-        Retrofit.Builder()
-            .baseUrl(BuildConfig.SERVER_RTA_BASE_URL)
-            .client(okHttpClient)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
-    }
 
 }

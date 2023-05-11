@@ -31,6 +31,7 @@ data class PhoneCheckResult(
 )
 
 data class Token(
-    @SerializedName("access_token")
-    val accessToken: String
+    @SerializedName("token")
+    val token: String,
+    val url: String
 )
