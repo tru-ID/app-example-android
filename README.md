@@ -9,7 +9,7 @@ You will need:
 
 - Android capable IDE e.g. [Android Studio](https://developer.android.com/studio)
 - A [tru.ID Account](https://tru.id)
-- The Node.js installed and the [tru.ID example dev server](https://github.com/tru-ID/dev-server) running locally
+- The Node.js installed and the latest version of the [tru.ID example dev server](https://github.com/tru-ID/dev-server) running locally
     - Follow the instructions within the tru.ID example node.js server README
     - A local tunnel solution such as [ngrok](https://ngrok.com/) The default `dev-server` port is 8080.
         - `ngrok http 8080`
