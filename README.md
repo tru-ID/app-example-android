@@ -3,29 +3,29 @@
 [![License][license-image]][license-url]
 
 
-## Before you being
+## Before you begin
 
 You will need:
 
 - Android capable IDE e.g. [Android Studio](https://developer.android.com/studio)
 - A [tru.ID Account](https://tru.id)
-- The Node.js installed and the [server example](https://github.com/tru-ID/server-example-node) running
+- The Node.js installed and the [tru.ID example dev server](https://github.com/tru-ID/dev-server) running locally
     - Follow the instructions within the tru.ID example node.js server README
-    - A local tunnel solution such as [ngrok](https://ngrok.com/)
+    - A local tunnel solution such as [ngrok](https://ngrok.com/) The default `dev-server` port is 8080.
+        - `ngrok http 8080`
 - An Android phone with a SIM card and mobile data connection
 
 ## Getting Started
 
-- Get the server example up and running
-- Run your local tunnel solution and tunnelling the requests to the running server
-- Clone or unzip the PhoneCheckExample into a directory.
+- Clone this repository into a directory: `git clone git@github.com:tru-ID/app-example-android.git`
 - Open the project with your Android Capable IDE
 - Once you have your server up and running make a copy of the `app/tru.properties.example` file `cp app/tru.properties.example app/tru.properties` and update the configuration value to be the URL of your example server.
     - `tru.properties`:
         ```
-        EXAMPLE_SERVER_BASE_URL="https://example.com"
+        EXAMPLE_SERVER_BASE_URL="<YOUR_NGROK_URL>"
         ```
 - Connect your phone to your computer so it's used for running the PhoneCheckExample application
+- Pair your phone to your computer, an active data connection on the phone is required for this application
 - Run the application from your IDE
 - Enter the phone number for the mobile device in the UI in the format +{country_code}{number} e.g. `+447900123456`
 - Press the done keyboard key or touch the "Verify my phone number" button
@@ -34,7 +34,7 @@ You will need:
 
 ## References
 
-- [tru.ID example node.js server](https://github.com/tru-ID/server-example-node)
+- [tru.ID example node.js dev server]((https://github.com/tru-ID/dev-server)
 
 ## Meta
 
