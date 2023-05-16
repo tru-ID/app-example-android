@@ -1,7 +1,16 @@
-# sample-app-android
+
+# tru.ID Android PhoneCheck Example
 
 [![License][license-image]][license-url]
 
+This repository is an example integration and usage of [tru.ID's SDK](https://github.com/tru-ID/tru-sdk-android) in an Android mobile application. In order to verify first that tru.ID has coverage of the mobile network operator being used, and that the phone number and SIM card match, this application uses two tru.ID APIs:
+
+- tru.ID [Coverage API](https://developer.tru.id/docs/reference/utils#tag/coverage/operation/get-coverage-by-device-ip)
+- tru.ID [PhoneCheck API](https://developer.tru.id/docs/phone-check/integration)
+
+The Coverage API determines whether the mobile network that a device is connected to is supported with tru.ID, and that the Products are available as well. This check is all carried out based on the sender's device IP Address. This API should be called first, because if the MNO is not supported, then you would be able to fallback to whatever other method of verification for the phone number that you use.
+
+The PhoneCheck API confirms the ownership of a mobile phone number by verifying the possession of an active SIM card with the same number. Using a mobile data session, a PhoneCheck is created with a unique Check URL. tru.ID then resolves a match between the phone number that the mobile network operator identifies as the owner of the mobile data session and the phone number.
 
 ## Before you begin
 
@@ -32,9 +41,26 @@ You will need:
 - You will see the result of the Phone Check
 - Get in touch: please email feedback@tru.id with any questions
 
+## How can I use tru.ID in my Android application?
+
+tru.ID have an [Android SDK](https://github.com/tru-ID/tru-sdk-android) that you can install into your Android application to make the implementation easier. This SDK also provides functionality to force a cellular data connection through native Android APIs.
+
+To begin with, add the public Maven repository to your Android IDE:
+
+- `https://gitlab.com/api/v4/projects/22035475/packages/maven`
+
+Then in your `build.gradle` add the following dependency:
+
+- `implementation 'id.tru.sdk:tru-sdk-android:x.y.z'`
+
+> **Note** Replace `x.y.z` with the latest version, which can be found on the [GitHub repository](https://github.com/tru-ID/tru-sdk-android/tags).
+
+Usage examples can be found also within the Android SDK [GitHub Repository](https://github.com/tru-ID/tru-sdk-android#usage-example).
+
 ## References
 
 - [tru.ID example node.js dev server]((https://github.com/tru-ID/dev-server)
+- [tru.ID Android SDK](https://github.com/tru-ID/tru-sdk-android)
 
 ## Meta
 
