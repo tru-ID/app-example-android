@@ -59,7 +59,7 @@ Usage examples can be found also within the Android SDK [GitHub Repository](http
 
 ## References
 
-- [tru.ID example node.js dev server]((https://github.com/tru-ID/dev-server)
+- [tru.ID example node.js dev server](https://github.com/tru-ID/dev-server)
 - [tru.ID Android SDK](https://github.com/tru-ID/tru-sdk-android)
 
 ## Meta
