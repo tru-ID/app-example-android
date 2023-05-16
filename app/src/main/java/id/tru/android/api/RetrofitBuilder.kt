@@ -25,4 +25,5 @@ object RetrofitBuilder {
             .build()
             .create(ApiService::class.java)
     }
+
 }

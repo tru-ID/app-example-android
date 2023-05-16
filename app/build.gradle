@@ -8,13 +8,13 @@ def props = new Properties()
 file("tru.properties").withInputStream { props.load(it) }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    compileSdkVersion 31
+    buildToolsVersion "31.0.0"
 
     defaultConfig {
         applicationId "id.tru.android"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.5"
 
@@ -48,8 +48,7 @@ android {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
 
-    implementation 'id.tru.sdk:tru-sdk-android:0.3.3'
-    implementation 'commons-io:commons-io:2.4'
+    implementation 'id.tru.sdk:tru-sdk-android:1.0.4'
     implementation 'androidx.appcompat:appcompat:1.3.0'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.annotation:annotation:1.2.0'
