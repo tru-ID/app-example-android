@@ -2,6 +2,7 @@ package id.tru.android.login
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -25,6 +26,7 @@ import id.tru.android.R
 import id.tru.android.databinding.ActivityLoginBinding
 import id.tru.android.model.Step
 import id.tru.android.util.PhoneNumberUtil
+import android.telephony.TelephonyManager
 import id.tru.sdk.TruSDK
 
 
@@ -38,7 +40,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var phoneCheckViewModel: PhoneCheckViewModel
     private lateinit var binding: ActivityLoginBinding
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -51,16 +52,32 @@ class LoginActivity : AppCompatActivity() {
         val loading = binding.loading
 
         tcAccepted.movementMethod = LinkMovementMethod.getInstance()
+
 //         Check for permission and request if not granted
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // For Android 11 and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) !=
                 PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.READ_PHONE_STATE),
-                REQUEST_PHONE_STATE_PERMISSION
-            )
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.READ_PHONE_NUMBERS),
+                    REQUEST_PHONE_STATE_PERMISSION
+                )
+            } else {
+                retrievePhoneNumber()
+            }
         } else {
-            retrievePhoneNumber()
+            // For Android 10 and below
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
+                PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.READ_PHONE_STATE),
+                    REQUEST_PHONE_STATE_PERMISSION
+                )
+            } else {
+                retrievePhoneNumber()
+            }
         }
+
 
         phoneCheckViewModel = ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
 
@@ -153,15 +170,8 @@ class LoginActivity : AppCompatActivity() {
     private fun retrievePhoneNumber():String?  {
         val phoneNumberUtil = PhoneNumberUtil(this)
         val phoneNumber = phoneNumberUtil.getPhoneNumber()
-        if (phoneNumber != null) {
-            //write a code to set phone to phone number from subscription manager (where phone is the variable to be displayed/input)
-            Log.d(TAG, "Phone number from Subscription Manager: $phoneNumber")
-            return phoneNumber
-        } else {
-            //Unable to retrieve phone number
-            Log.d(TAG, "Unable to retrieve phone number")
-            return "no phone number"
-        }
+        return phoneNumber
+        Log.d(TAG, "phoneNumber  ${phoneNumber}" )
     }
 
     override fun onRequestPermissionsResult(
@@ -176,7 +186,7 @@ class LoginActivity : AppCompatActivity() {
                retrievePhoneNumber()
                 val phoneNumber = retrievePhoneNumber()
                 Log.d(TAG, "phone number retrieved")
-                Log.d(TAG, "Phone number from Subscription Manager: $phoneNumber")
+                Log.d(TAG, "Phone number from Telephony Manager: $phoneNumber")
             } else {
                 //Permission denied
                 Log.d(TAG, "Permission denied")

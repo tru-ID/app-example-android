@@ -25,31 +25,43 @@ import com.google.i18n.phonenumbers.Phonenumber
  */
 class PhoneNumberUtil(private val context: Context) {
     fun getPhoneNumber(): String? {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return null
-        }
-        val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            val subscriptionManager = context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-            val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-            println("subscriptionInfo List $activeSubscriptionInfoList")
-            if (activeSubscriptionInfoList != null && activeSubscriptionInfoList.isNotEmpty()) {
-                val subscriptionInfo = activeSubscriptionInfoList[0]
-                println(" before subscriptionInfo.number $subscriptionInfo.number")
-                return subscriptionInfo.number
-                println(" subscriptionInfo.number $subscriptionInfo.number")
+        val telephonyManager =
+            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_PHONE_NUMBERS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                return telephonyManager.line1Number
             } else {
-                println(" subscriptionInfo.number null")
+                return null
             }
         } else {
-            println("before tele")
-            return telephonyManager.line1Number
-            println("after tele")
+            // For Android 10 and below
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_PHONE_STATE
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                val subscriptionManager = context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+                val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+                println("subscriptionInfo List $activeSubscriptionInfoList")
+                if (activeSubscriptionInfoList != null && activeSubscriptionInfoList.isNotEmpty()) {
+                    val subscriptionInfo = activeSubscriptionInfoList[0]
+                    println(" before subscriptionInfo.number $subscriptionInfo.number")
+                    return subscriptionInfo.number
+                    println(" subscriptionInfo.number $subscriptionInfo.number")
+                } else {
+                    println(" subscriptionInfo.number null")
+                    return null
+                }
 
+            } else {
+                return null
+            }
         }
-        return null
-        println("could not get phone number")
+
     }
 
     fun isPhoneNumberValid(phoneNumber: String): Boolean {
@@ -64,6 +76,9 @@ class PhoneNumberUtil(private val context: Context) {
             false
         }
     }
-
 }
+
+
+
+
 
