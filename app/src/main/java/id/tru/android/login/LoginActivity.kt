@@ -1,6 +1,8 @@
 package id.tru.android.login
 
+import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -14,11 +16,15 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.textfield.TextInputEditText
 import id.tru.android.R
 import id.tru.android.databinding.ActivityLoginBinding
 import id.tru.android.model.Step
+import id.tru.android.util.PhoneNumberUtil
 import id.tru.sdk.TruSDK
 
 
@@ -45,6 +51,16 @@ class LoginActivity : AppCompatActivity() {
         val loading = binding.loading
 
         tcAccepted.movementMethod = LinkMovementMethod.getInstance()
+//         Check for permission and request if not granted
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                REQUEST_PHONE_STATE_PERMISSION
+            )
+        } else {
+            retrievePhoneNumber()
+        }
 
         phoneCheckViewModel = ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
 
@@ -134,6 +150,39 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
+    private fun retrievePhoneNumber():String?  {
+        val phoneNumberUtil = PhoneNumberUtil(this)
+        val phoneNumber = phoneNumberUtil.getPhoneNumber()
+        if (phoneNumber != null) {
+            //write a code to set phone to phone number from subscription manager (where phone is the variable to be displayed/input)
+            Log.d(TAG, "Phone number from Subscription Manager: $phoneNumber")
+            return phoneNumber
+        } else {
+            //Unable to retrieve phone number
+            Log.d(TAG, "Unable to retrieve phone number")
+            return "no phone number"
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_PHONE_STATE_PERMISSION) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Before phone number retrieved")
+               retrievePhoneNumber()
+                val phoneNumber = retrievePhoneNumber()
+                Log.d(TAG, "phone number retrieved")
+                Log.d(TAG, "Phone number from Subscription Manager: $phoneNumber")
+            } else {
+                //Permission denied
+                Log.d(TAG, "Permission denied")
+            }
+        }
+    }
 
     override fun onResume() {
         super.onResume()
@@ -186,6 +235,7 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "LoginActivity"
+        private const val REQUEST_PHONE_STATE_PERMISSION = 1
     }
 }
 
