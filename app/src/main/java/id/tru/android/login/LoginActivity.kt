@@ -2,7 +2,6 @@ package id.tru.android.login
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -14,19 +13,16 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.textfield.TextInputEditText
 import id.tru.android.R
 import id.tru.android.databinding.ActivityLoginBinding
 import id.tru.android.model.Step
 import id.tru.android.util.PhoneNumberUtil
-import android.telephony.TelephonyManager
 import id.tru.sdk.TruSDK
 
 
@@ -42,7 +38,6 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -53,31 +48,12 @@ class LoginActivity : AppCompatActivity() {
 
         tcAccepted.movementMethod = LinkMovementMethod.getInstance()
 
-//         Check for permission and request if not granted
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // For Android 11 and above
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) !=
-                PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_PHONE_NUMBERS),
-                    REQUEST_PHONE_STATE_PERMISSION
-                )
-            } else {
-                retrievePhoneNumber()
-            }
+//        Check for permission and request if not granted
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPhoneStatePermission()
         } else {
-            // For Android 10 and below
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
-                PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(Manifest.permission.READ_PHONE_STATE),
-                    REQUEST_PHONE_STATE_PERMISSION
-                )
-            } else {
-                retrievePhoneNumber()
-            }
+            populatePhoneNumber()
         }
-
 
         phoneCheckViewModel = ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
 
@@ -167,11 +143,46 @@ class LoginActivity : AppCompatActivity() {
             }
         }
     }
-    private fun retrievePhoneNumber():String?  {
+
+    private fun requestPhoneStatePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // For Android 11 and above
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) !=
+                PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.READ_PHONE_NUMBERS),
+                    REQUEST_PHONE_STATE_PERMISSION
+                )
+            } else {
+                populatePhoneNumber()
+            }
+        } else {
+            // For Android 10 and below
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
+                PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.READ_PHONE_STATE),
+                    REQUEST_PHONE_STATE_PERMISSION
+                )
+            } else {
+                populatePhoneNumber()
+            }
+        }
+    }
+
+    private fun retrievePhoneNumber(): String? {
         val phoneNumberUtil = PhoneNumberUtil(this)
-        val phoneNumber = phoneNumberUtil.getPhoneNumber()
-        return phoneNumber
-        Log.d(TAG, "phoneNumber  ${phoneNumber}" )
+        return phoneNumberUtil.getPhoneNumber()
+        Log.d(TAG, "phoneNumber  ${phoneNumberUtil.getPhoneNumber()}")
+
+    }
+
+    private fun populatePhoneNumber() {
+        if (!retrievePhoneNumber().isNullOrEmpty()) {
+            binding.phone.setText(retrievePhoneNumber())
+        } else {
+            Log.d(TAG, "Phone number cannot be populated")
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -182,11 +193,7 @@ class LoginActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_PHONE_STATE_PERMISSION) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Before phone number retrieved")
-               retrievePhoneNumber()
-                val phoneNumber = retrievePhoneNumber()
-                Log.d(TAG, "phone number retrieved")
-                Log.d(TAG, "Phone number from Telephony Manager: $phoneNumber")
+                populatePhoneNumber()
             } else {
                 //Permission denied
                 Log.d(TAG, "Permission denied")
@@ -198,6 +205,23 @@ class LoginActivity : AppCompatActivity() {
         super.onResume()
         Log.d(TAG, "onResume: TruSDK is being initialised")
         TruSDK.initializeSdk(applicationContext)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || hasPhoneStatePermission()) {
+            populatePhoneNumber()
+        }
+    }
+
+    private fun hasPhoneStatePermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_PHONE_NUMBERS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PackageManager.PERMISSION_GRANTED
+        }
     }
 
     private fun resetProgress() {
