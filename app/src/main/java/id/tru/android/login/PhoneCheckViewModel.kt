@@ -9,7 +9,9 @@ import androidx.lifecycle.viewModelScope
 import id.tru.android.model.PhoneCheckRepository
 import id.tru.android.model.Result
 import id.tru.android.R
+import id.tru.android.model.ReachabilityResult
 import id.tru.android.model.VerificationCheckResult
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PhoneCheckViewModel(private val phoneCheckRepository: PhoneCheckRepository) : ViewModel() {
@@ -41,6 +43,37 @@ class PhoneCheckViewModel(private val phoneCheckRepository: PhoneCheckRepository
                     Log.e(TAG, result.exception.toString())
                 }
                 else -> _phoneCheckResult.value = VerificationCheckResult(error = R.string.invalid_app_state)
+            }
+        }
+    }
+
+    fun crossCheckPhoneNumberWithReachable(mccMncNumber: String?, updateUI: (input: String) -> Unit) {
+        // Any coroutines launched from viewModelScope without a Dispatchers.IO param, runs in the main thread.
+        viewModelScope.launch {
+            val result: Result<ReachabilityResult> = try {
+                phoneCheckRepository.retrieveNetworkInfo()
+            } catch (e: Exception) {
+                Result.Error(e)
+            }
+            when (result) {
+                is Result.Success ->  {
+                    if (result.data.networkAliases != null) {
+                        for(item in result.data.networkAliases) {
+                            if(item == mccMncNumber){
+                                // Either return a result or some how Populate UI
+                                launch(Dispatchers.Main) {
+                                    updateUI(item)
+                                }
+                                break
+                            }
+                        }
+                    }
+                    Log.d(TAG, "Reachability Success")
+                }
+                is Result.Error -> {
+                    Log.e(TAG, result.exception.toString())
+                }
+                else -> Log.d(TAG, "Unknown problem")
             }
         }
     }

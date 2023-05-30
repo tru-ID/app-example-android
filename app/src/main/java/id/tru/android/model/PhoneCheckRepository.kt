@@ -3,9 +3,8 @@ package id.tru.android.model
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import id.tru.android.R
-import id.tru.android.login.VerifiedPhoneNumberView
+import id.tru.android.login.VerifiedPhoneNumberModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 /**
@@ -40,6 +39,16 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
                     if (resp.optJSONObject("response_body") != null) {
                         val body = resp.optJSONObject("response_body")
                         Log.d(TAG, "is reachable on " + body.optString("network_name"))
+
+                        val networkId = body.optString("network_id")
+                        val networkArray = body.getJSONArray("network_aliases")
+                        val networkAliases: MutableList<String> = mutableListOf()
+                        for (i in 0 until networkArray.length()) {
+                            val alias = networkArray.getString(i)
+                            networkAliases.add(alias)
+                        }
+                        networkAliases.add(networkId)
+                        Log.d(TAG, "network array  + $networkAliases")
                         // Signal Step1 Update
                         dataSourcePhoneCheckResult.postValue(
                             VerificationCheckResult(
@@ -102,7 +111,7 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
                                             )
                                             //Here - Signal Step4 Update
                                             if (phoneCheckResult is Result.Success) {
-                                                val view = VerifiedPhoneNumberView(
+                                                val view = VerifiedPhoneNumberModel(
                                                     phoneNumber = phoneNumber,
                                                     checkId = phoneCheckResult.data.check_id,
                                                     match = phoneCheckResult.data.match
@@ -175,6 +184,50 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
                                 Result.Error( Exception("Unknown error (incorrect Loading update?)"))
                             }
                         }
+                    } else {
+                        Result.Error( Exception("Error in retrieving reachability response body"))
+                    }
+                }
+                else if (reachabilityStatus == 400) {
+                    Log.d(TAG, "not reachable: not a supported MNO")
+                    Result.Error( Exception("not reachable: not a supported MNO"))
+                } else if (reachabilityStatus == 412) {
+                    Log.d(TAG, "not reachable: not a mobile IP")
+                    Result.Error( Exception("not reachable: not a mobile IP"))
+                } else {
+                    Log.d(TAG, "not reachable: other error")
+                    Result.Error( Exception("not reachable: other error"))
+                }
+            }
+        }
+    }
+
+    @Throws(Exception::class)
+    suspend fun retrieveNetworkInfo(): Result<ReachabilityResult> {
+        // Create a new coroutine off the UI main thread, on an I/O thread
+        // Move the execution of the coroutine to the I/O dispatcher
+        return withContext(Dispatchers.IO) {
+            var reachabilityStatus: Int = 500
+            val resp = dataSource.isReachable("https://eu.api.tru.id/coverage/v0.1/device_ip")
+            if (resp.optString("error") != "") {
+                println("not reachable: ${resp.optString("error_description")}")
+                Result.Error( Exception("Not reachable: ${resp.optString("error_description")} "))
+            } else {
+                reachabilityStatus = resp.optInt("http_status")
+                if (reachabilityStatus == 200 ) {
+                    if (resp.optJSONObject("response_body") != null) {
+                        val body = resp.optJSONObject("response_body")
+                        Log.d(TAG, "is reachable on " + body.optString("network_name"))
+                        val networkId = body.optString("network_id")
+                        val networkArray = body.getJSONArray("network_aliases")
+                        val networkAliases: MutableList<String> = mutableListOf()
+                        for (i in 0 until networkArray.length()) {
+                            val alias = networkArray.getString(i)
+                            networkAliases.add(alias)
+                        }
+                        networkAliases.add(networkId)
+                        Log.d(TAG, "network array  + $networkAliases")
+                        Result.Success(ReachabilityResult(networkAliases))
                     } else {
                         Result.Error( Exception("Error in retrieving reachability response body"))
                     }
