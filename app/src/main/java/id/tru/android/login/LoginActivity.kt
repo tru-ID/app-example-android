@@ -147,8 +147,8 @@ class LoginActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.Q)
     private fun retrieveDataConnectivityPhoneNumber(reachabilityResponseBody: JSONObject): String? {
-        val phoneNumberUtil = PhoneNumberUtil(this)
-        return phoneNumberUtil.getDataConnectivityPhoneNumber(reachabilityResponseBody )
+        val phoneNumberUtil = PhoneNumberUtil()
+        return phoneNumberUtil.getDataConnectivityPhoneNumber(reachabilityResponseBody, this)
     }
 
     //-->> UI Update Utility methods

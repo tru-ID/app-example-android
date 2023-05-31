@@ -16,7 +16,7 @@ import org.json.JSONObject
 /**
  * Class that gets phone number from TelephonyManager or Subscription Manager
  */
-class PhoneNumberUtil(private val context: Context) {
+class PhoneNumberUtil() {
     /**
      * This method receives the JSONObject returned by isReachable method. Specifically, the
      * body of the response.
@@ -26,7 +26,7 @@ class PhoneNumberUtil(private val context: Context) {
      * response body and gets the phone number if it's a match.
      */
     @RequiresApi(Build.VERSION_CODES.Q)
-    fun getDataConnectivityPhoneNumber(reachabilityResponseBody: JSONObject): String? {
+    fun getDataConnectivityPhoneNumber(reachabilityResponseBody: JSONObject, context: Context): String? {
         val networkId = reachabilityResponseBody.optString("network_id")
         val networkArray = reachabilityResponseBody.getJSONArray("network_aliases")
         val networkAliases: MutableList<String> = mutableListOf()
@@ -54,12 +54,7 @@ class PhoneNumberUtil(private val context: Context) {
                             return telephonyManager.line1Number
                         }
                     }
-                    return null
-                } else {
-                    return null
                 }
-            } else {
-                return null
             }
         } else {
             // For Android 10 and below
@@ -82,17 +77,11 @@ class PhoneNumberUtil(private val context: Context) {
                                 return subscriptionInfo.number
                             }
                         }
-                        return null
-                    } else {
-                        return null
                     }
-                } else {
-                    return null
                 }
-            } else {
-                return null
             }
         }
+        return null
     }
 
     fun isPhoneNumberValid(phoneNumber: String): Boolean {
