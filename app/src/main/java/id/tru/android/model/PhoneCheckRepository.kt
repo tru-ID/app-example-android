@@ -3,9 +3,8 @@ package id.tru.android.model
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import id.tru.android.R
-import id.tru.android.login.VerifiedPhoneNumberView
+import id.tru.android.login.VerifiedPhoneNumberModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 /**
@@ -102,7 +101,7 @@ class PhoneCheckRepository(val dataSource: PhoneCheckDataSource) {
                                             )
                                             //Here - Signal Step4 Update
                                             if (phoneCheckResult is Result.Success) {
-                                                val view = VerifiedPhoneNumberView(
+                                                val view = VerifiedPhoneNumberModel(
                                                     phoneNumber = phoneNumber,
                                                     checkId = phoneCheckResult.data.check_id,
                                                     match = phoneCheckResult.data.match

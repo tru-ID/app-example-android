@@ -19,8 +19,9 @@ import androidx.lifecycle.ViewModelProvider
 import id.tru.android.R
 import id.tru.android.databinding.ActivityLoginBinding
 import id.tru.android.model.Step
+import id.tru.android.util.PhoneNumberUtil
 import id.tru.sdk.TruSDK
-
+import org.json.JSONObject
 
 /**
  * Add blazingly fast mobile phone verification to your app for 2FA or passwordless onboarding.
@@ -30,23 +31,23 @@ import id.tru.sdk.TruSDK
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var phoneCheckViewModel: PhoneCheckViewModel
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var activityLoginBinding: ActivityLoginBinding
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    //---> Activity Lifecycle calls -- START -->
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        activityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(activityLoginBinding.root)
 
-        binding = ActivityLoginBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        val phone = binding.phone
-        val tcAccepted = binding.tcAccepted
-        val login = binding.login
-        val loading = binding.loading
+        val phone = activityLoginBinding.phone
+        val tcAccepted = activityLoginBinding.tcAccepted
+        val login = activityLoginBinding.login
+        val loading = activityLoginBinding.loading
 
         tcAccepted.movementMethod = LinkMovementMethod.getInstance()
 
-        phoneCheckViewModel = ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
+        phoneCheckViewModel =
+            ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
 
         phoneCheckViewModel.verificationFormState.observe(this@LoginActivity, Observer {
             val loginState = it ?: return@Observer
@@ -71,26 +72,26 @@ class LoginActivity : AppCompatActivity() {
 
                 val (step, msgReference, shouldCheck) = triple
                 val msg = getString(msgReference)
-                when(step) {
+                when (step) {
                     Step.FIRST -> {
-                        binding.progressStep1.visibility = View.VISIBLE
-                        binding.progressStep1.check()
-                        binding.step1Tv.text = msg //success or error msg
+                        activityLoginBinding.progressStep1.visibility = View.VISIBLE
+                        activityLoginBinding.progressStep1.check()
+                        activityLoginBinding.step1Tv.text = msg //success or error msg
                     }
                     Step.SECOND -> {
-                        binding.step2.visibility = View.VISIBLE
-                        if (shouldCheck) binding.progressStep2.check()
-                        binding.step2Tv.text = msg
+                        activityLoginBinding.step2.visibility = View.VISIBLE
+                        if (shouldCheck) activityLoginBinding.progressStep2.check()
+                        activityLoginBinding.step2Tv.text = msg
                     }
                     Step.THIRD -> {
-                        binding.step3.visibility = View.VISIBLE
-                        if (shouldCheck) binding.progressStep3.check()
-                        binding.step3Tv.text = msg //Either done on cellular or not
+                        activityLoginBinding.step3.visibility = View.VISIBLE
+                        if (shouldCheck) activityLoginBinding.progressStep3.check()
+                        activityLoginBinding.step3Tv.text = msg //Either done on cellular or not
                     }
                     Step.FOURTH -> {
-                       binding.step4.visibility = View.VISIBLE
-                        if (shouldCheck) binding.progressStep4.check()
-                        binding.step4Tv.text = msg //success or error msg
+                        activityLoginBinding.step4.visibility = View.VISIBLE
+                        if (shouldCheck) activityLoginBinding.progressStep4.check()
+                        activityLoginBinding.step4Tv.text = msg //success or error msg
                     }
                 }
             }
@@ -113,7 +114,10 @@ class LoginActivity : AppCompatActivity() {
 
         phone.apply {
             afterTextChanged {
-                phoneCheckViewModel.loginDataChanged(phone.text.toString(), tcAccepted = tcAccepted.isChecked)
+                phoneCheckViewModel.loginDataChanged(
+                    phone.text.toString(),
+                    tcAccepted = tcAccepted.isChecked
+                )
             }
 
             setOnEditorActionListener { _, actionId, _ ->
@@ -141,24 +145,32 @@ class LoginActivity : AppCompatActivity() {
         TruSDK.initializeSdk(applicationContext)
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun retrieveDataConnectivityPhoneNumber(reachabilityResponseBody: JSONObject): String? {
+        val phoneNumberUtil = PhoneNumberUtil()
+        return phoneNumberUtil.getDataConnectivityPhoneNumber(reachabilityResponseBody, this)
+    }
+
+    //-->> UI Update Utility methods
+
     private fun resetProgress() {
-        binding.loadingLayout.visibility = View.VISIBLE
+        activityLoginBinding.loadingLayout.visibility = View.VISIBLE
 
-        binding.step1.visibility = View.INVISIBLE
-        binding.step2.visibility = View.INVISIBLE
-        binding.step3.visibility = View.INVISIBLE
-        binding.step4.visibility = View.INVISIBLE
+        activityLoginBinding.step1.visibility = View.INVISIBLE
+        activityLoginBinding.step2.visibility = View.INVISIBLE
+        activityLoginBinding.step3.visibility = View.INVISIBLE
+        activityLoginBinding.step4.visibility = View.INVISIBLE
 
-        binding.progressStep1.uncheck()
-        binding.progressStep2.uncheck()
-        binding.progressStep3.uncheck()
-        binding.progressStep4.uncheck()
+        activityLoginBinding.progressStep1.uncheck()
+        activityLoginBinding.progressStep2.uncheck()
+        activityLoginBinding.progressStep3.uncheck()
+        activityLoginBinding.progressStep4.uncheck()
 
     }
 
     private fun updateUIonError(additionalInfo: String) {
         Log.e(TAG, "$additionalInfo")
-        binding.phone.setText("")
+        activityLoginBinding.phone.setText("")
         Toast.makeText(
             applicationContext,
             additionalInfo,
@@ -174,7 +186,7 @@ class LoginActivity : AppCompatActivity() {
         ).show()
     }
 
-    private fun updateUIonSuccess(model: VerifiedPhoneNumberView) {
+    private fun updateUIonSuccess(model: VerifiedPhoneNumberModel) {
         val welcome = getString(R.string.welcome)
         // TODO : initiate successful logged in experience
         Toast.makeText(
