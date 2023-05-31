@@ -11,10 +11,6 @@ data class VerificationCheckResult(
     val error: Int? = null
 )
 
-data class ReachabilityResult(
-    val networkAliases: MutableList<String>? = null
-)
-
 enum class Step {
     FIRST, SECOND, THIRD, FOURTH
 }

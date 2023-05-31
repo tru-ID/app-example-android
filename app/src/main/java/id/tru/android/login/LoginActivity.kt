@@ -1,8 +1,6 @@
 package id.tru.android.login
 
-import android.Manifest
 import android.app.Activity
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
@@ -16,8 +14,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import id.tru.android.R
@@ -25,6 +21,7 @@ import id.tru.android.databinding.ActivityLoginBinding
 import id.tru.android.model.Step
 import id.tru.android.util.PhoneNumberUtil
 import id.tru.sdk.TruSDK
+import org.json.JSONObject
 
 /**
  * Add blazingly fast mobile phone verification to your app for 2FA or passwordless onboarding.
@@ -37,7 +34,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var activityLoginBinding: ActivityLoginBinding
 
     //---> Activity Lifecycle calls -- START -->
-    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         activityLoginBinding = ActivityLoginBinding.inflate(layoutInflater)
@@ -49,14 +45,6 @@ class LoginActivity : AppCompatActivity() {
         val loading = activityLoginBinding.loading
 
         tcAccepted.movementMethod = LinkMovementMethod.getInstance()
-
-//        Check for permission and request if not granted
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPhoneStatePermission()
-        } else {
-            //TODO: isReachable test is required need to sort this out.
-            populatePhoneNumber()
-        }
 
         phoneCheckViewModel =
             ViewModelProvider(this, VerifyViewModelFactory()).get(PhoneCheckViewModel::class.java)
@@ -155,110 +143,12 @@ class LoginActivity : AppCompatActivity() {
         super.onResume()
         Log.d(TAG, "onResume: TruSDK is being initialised")
         TruSDK.initializeSdk(applicationContext)
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || hasPhoneStatePermission()) {
-            //TODO: isReachable test is required need to sort this out.
-            populatePhoneNumber()
-        }
-    }
-
-    //---> Activity Lifecycle calls -- END -->
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun requestPhoneStatePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // For Android 11 and above
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_NUMBERS) !=
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_PHONE_NUMBERS),
-                    REQUEST_PHONE_STATE_PERMISSION
-                )
-            } else {
-                retrieveAndUpdateUIWithPhoneNumber()
-            }
-        } else {
-            // For Android 10 and below
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) !=
-                PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.READ_PHONE_STATE),
-                    REQUEST_PHONE_STATE_PERMISSION
-                )
-            } else {
-                retrieveAndUpdateUIWithPhoneNumber()
-            }
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun retrieveAndUpdateUIWithPhoneNumber() {
-        retrieveMccMncNumber()
-        Log.d(TAG, "Mcc Mnc  ${retrieveMccMncNumber()}")
-        populatePhoneNumber()
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    private fun retrieveMccMncNumber(): String? {
+    private fun retrieveDataConnectivityPhoneNumber(reachabilityResponseBody: JSONObject): String? {
         val phoneNumberUtil = PhoneNumberUtil(this)
-        return phoneNumberUtil.getMccMncNumber()
-    }
-
-    private fun retrievePhoneNumber(): String? {
-        val phoneNumberUtil = PhoneNumberUtil(this)
-        return phoneNumberUtil.getPhoneNumber()
-    }
-
-    private fun populatePhoneNumber() {
-        val phoneNumber = retrievePhoneNumber()
-        if (!phoneNumber.isNullOrEmpty()) {
-            activityLoginBinding.phone.setText(phoneNumber)
-        } else {
-            Log.d(TAG, "Phone number cannot be populated")
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.Q)
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_PHONE_STATE_PERMISSION) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                val mccMncNumber = retrieveMccMncNumber()
-                phoneCheckViewModel.crossCheckPhoneNumberWithReachable(
-                    mccMncNumber = mccMncNumber,
-                    updateUI = this::updateUI
-                )
-            } else {
-                //Permission denied
-                Log.d(TAG, "Permission denied")
-            }
-        }
-    }
-
-    private fun updateUI(input: String) {
-        println("NetworkId from Telephony/Subscription Manager: $input")
-        populatePhoneNumber()
-    }
-
-    private fun hasPhoneStatePermission(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_PHONE_NUMBERS
-            ) == PackageManager.PERMISSION_GRANTED
-        } else {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_PHONE_STATE
-            ) == PackageManager.PERMISSION_GRANTED
-        }
+        return phoneNumberUtil.getDataConnectivityPhoneNumber(reachabilityResponseBody )
     }
 
     //-->> UI Update Utility methods
@@ -308,7 +198,6 @@ class LoginActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "LoginActivity"
-        private const val REQUEST_PHONE_STATE_PERMISSION = 1
     }
 }
 
