@@ -69,7 +69,7 @@ class PhoneNumberUtil() {
                     val subscriptionInfo = activeSubscriptionInfoList[0]
                     val mccString = subscriptionInfo.mccString
                     val mncString = subscriptionInfo.mncString
-                    val mccMncString = "$mccString+$mncString"
+                    val mccMncString = "$mccString$mncString"
                     println(" mccMncString $mccMncString")
                     if (!mccMncString.isNullOrEmpty()) {
                         for (item in networkAliases) {
