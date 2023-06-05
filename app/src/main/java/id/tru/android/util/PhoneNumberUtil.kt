@@ -35,46 +35,31 @@ class PhoneNumberUtil() {
             networkAliases.add(alias)
         }
         networkAliases.add(networkId)
-        val telephonyManager =
-            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        val subscriptionManager =
-            context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-        // For Android 11 and above
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_PHONE_NUMBERS
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                val networkOperator = telephonyManager.networkOperator
-                println("networkOperator from Telephony Manager: ${telephonyManager.networkOperator}")
-                if (!networkOperator.isNullOrEmpty()) {
-                    for (item in networkAliases) {
-                        if (item == networkOperator) {
-                            return telephonyManager.line1Number
-                        }
-                    }
-                }
-            }
-        } else {
-            // For Android 10 and below
-            if (ActivityCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_PHONE_STATE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
-                println("subscriptionInfo List $activeSubscriptionInfoList")
-                if (!activeSubscriptionInfoList.isNullOrEmpty()) {
-                    val subscriptionInfo = activeSubscriptionInfoList[0]
-                    val mccString = subscriptionInfo.mccString
-                    val mncString = subscriptionInfo.mncString
-                    val mccMncString = "$mccString$mncString"
-                    println(" mccMncString $mccMncString")
-                    if (!mccMncString.isNullOrEmpty()) {
-                        for (item in networkAliases) {
-                            if (item == mccMncString) {
-                                return subscriptionInfo.number
+        if (
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_PHONE_NUMBERS
+            ) == PackageManager.PERMISSION_GRANTED &&
+            ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_PHONE_STATE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            val subscriptionManager =
+                context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+            val activeSubscriptionInfoList = subscriptionManager.activeSubscriptionInfoList
+            val defaultDataSlotId = SubscriptionManager.getDefaultDataSubscriptionId()
+            if (!activeSubscriptionInfoList.isNullOrEmpty()) {
+                for (subscriptionInfo in activeSubscriptionInfoList) {
+                    if (subscriptionInfo.subscriptionId == defaultDataSlotId) {
+                        val mccString = subscriptionInfo.mccString
+                        val mncString = subscriptionInfo.mncString
+                        val mccMncString = "$mccString$mncString"
+                        if (mccMncString.isNotEmpty()) {
+                            for (item in networkAliases) {
+                                if (item == mccMncString) {
+                                    return subscriptionInfo.number
+                                }
                             }
                         }
                     }
